@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Pawtential — Dogs</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root{
+  --ink:#ffffff; --muted:#cfc6ff; --neon:#b05bff; --neon-2:#8a3bff;
+  --ring: rgba(176,91,255,0.12); --shadow: 0 20px 60px rgba(16,6,28,0.7);
+  --glass: rgba(255,255,255,0.03);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:Urbanist,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:#050009 url("stock-vector-dark-abstract-welcome-page-with-purple-blue-waves-2633393175.jpg") center/cover fixed;color:var(--ink);-webkit-font-smoothing:antialiased}
+
+/* Glossy overlay */
+body::after{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(120deg, rgba(176,91,255,0.06), rgba(138,59,255,0.03), rgba(92,225,255,0.03));mix-blend-mode:overlay;opacity:0.36;animation:glossShift 9s linear infinite}
+@keyframes glossShift{0%{transform:translateX(-40%) rotate(6deg)}50%{transform:translateX(40%) rotate(6deg)}100%{transform:translateX(-40%) rotate(6deg)}}
+
+/* Header / nav */
+.header{position:sticky;top:0;z-index:1200;background:linear-gradient(180deg, rgba(6,6,10,0.72), rgba(6,6,10,0.4));border-bottom:1px solid rgba(255,255,255,0.03);backdrop-filter:blur(6px)}
+.nav{max-width:1200px;margin:0 auto;padding:12px 16px;display:flex;gap:12px;align-items:center}
+.brand{display:flex;gap:12px;align-items:center;cursor:pointer}
+.brand img{width:44px;height:44px;border-radius:10px;object-fit:cover;box-shadow:0 10px 30px rgba(0,0,0,0.6)}
+.brand .name{font-weight:800;font-size:18px;color:var(--ink)}
+
+/* Search */
+.search{flex:1;display:flex;gap:8px;align-items:center}
+.searchbar{flex:1;display:flex;align-items:center;gap:8px;padding:8px;border-radius:12px;background:var(--glass);border:1px solid rgba(255,255,255,0.04)}
+.searchbar input{flex:1;background:transparent;border:0;outline:none;color:var(--ink);padding:8px 10px;font-size:15px}
+.searchbar .btn{background:transparent;border:0;color:var(--ink);cursor:pointer;padding:8px}
+.suggestions{position:relative}
+.suggestions-list{position:absolute;left:0;right:0;top:46px;background:rgba(2,2,6,0.9);border:1px solid rgba(255,255,255,0.04);border-radius:10px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.6);z-index:200}
+.suggestions-list button{display:block;width:100%;text-align:left;padding:10px 12px;border:0;background:transparent;color:var(--ink);cursor:pointer}
+.suggestions-list button:hover{background:linear-gradient(90deg, rgba(176,91,255,0.03), rgba(255,255,255,0.02))}
+
+/* Banner */
+.banner{margin:20px auto;border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,0.04);box-shadow:var(--shadow);max-width:1200px}
+.banner video{width:100%;height:auto;display:block;object-fit:cover;max-height:48vh}
+.banner .slogan{position:absolute;left:20px;top:18px;color:var(--ink);text-shadow:0 6px 18px rgba(0,0,0,0.6);background:linear-gradient(90deg, rgba(2,20,21,0.6), rgba(2,20,21,0.25));padding:12px 16px;border-radius:8px;font-weight:700;}
+
+/* Page layout */
+.container{max-width:1200px;margin:18px auto;padding:0 16px}
+.section{margin-top:20px}
+.section h2{font-size:26px;margin-bottom:12px;color:var(--ink)}
+
+/* Breed grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+.card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:12px;text-align:center;color:var(--ink);transition:transform .18s}
+.card:hover{transform:translateY(-6px)}
+.card img{width:100%;height:120px;object-fit:cover;border-radius:10px}
+.card .title{font-weight:800;margin-top:8px}
+
+/* Accessories grid (larger thumbs) */
+.grid-large{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.item img{width:100%;height:160px;object-fit:cover;border-radius:12px}
+
+/* Extras */
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.cta{display:inline-block;padding:10px 14px;border-radius:10px;background:linear-gradient(90deg,var(--neon),var(--neon-2));color:#021217;font-weight:800;text-decoration:none}
+
+/* Celebrity & cafes */
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+
+/* Footer */
+.footer{max-width:1200px;margin:26px auto;padding:18px;text-align:center;color:var(--muted)}
+
+/* responsive tweaks */
+@media(max-width:900px){ .banner .slogan{font-size:14px} .card img{height:100px} .item img{height:130px} }
+</style>
+</head>
+<body>
+
+<!-- header -->
+<header class="header">
+  <div class="nav">
+    <div class="brand" onclick="location.href='index.html'">
+      <img src="logo.jpeg" alt="logo">
+      <div class="name">Pawtential</div>
+    </div>
+
+    <div class="search">
+      <div class="searchbar" role="search" aria-label="Search site">
+        <span style="display:flex;align-items:center;gap:8px">
+          <button class="btn" aria-hidden="true">🔎</button>
+        </span>
+        <div style="flex:1;position:relative">
+          <input id="searchInput" placeholder="Search breeds, collars, toys, cafes, vets…" aria-autocomplete="list" autocomplete="off">
+          <div class="suggestions" id="suggestions" aria-hidden="true"></div>
+        </div>
+        <button class="btn" id="searchGo" title="Search">Go</button>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="btn" title="Orders" onclick="location.href='orders.html'">🚚</button>
+      <button class="btn" title="Support" onclick="location.href='support.html'">📞</button>
+      <button class="btn" title="Account" onclick="location.href='account.html'">👤</button>
+      <a class="cta" href="#breeds">Browse</a>
+    </div>
+  </div>
+</header>
+
+<!-- banner (video) -->
+<div class="banner" style="position:relative">
+  <!-- developer-provided upload path used here; replace if needed -->
+  <video src="dog.mp4" autoplay muted loop playsinline></video>
+  <div class="slogan">Dogs: Loyal. Playful. Loved. — Find breeds, gear & activities below.</div>
+</div>
+
+<!-- content container -->
+<div class="container">
+
+  <!-- quick links -->
+  <section class="section" id="quickLinks">
+    <div class="row" style="align-items:center;justify-content:space-between">
+      <div>
+        <a class="cta" href="#breeds">Search by breed</a>
+        <a class="cta" href="#accessories">Accessories</a>
+        <a class="cta" href="#activities">Activities</a>
+        <a class="cta" href="#celebs">Celebrity Dogs</a>
+      </div>
+
+      <div style="font-size:13px;color:var(--muted)">Tip: type “Labrador”, “collar”, “dog café” or vet names in search</div>
+    </div>
+  </section>
+
+  <!-- Breeds -->
+  <section class="section" id="breeds">
+    <h2>Search by breed</h2>
+    <div class="grid" id="breedsGrid">
+      <!-- Replace src with your images later -->
+      <a class="card" href="https://en.wikipedia.org/wiki/Labrador_Retriever" target="_blank"><img src="2.jpeg" alt="Labrador"><div class="title">Labrador</div></a>
+      <a class="card" href="https://en.wikipedia.org/wiki/German_Shepherd" target="_blank"><img src="3.jpeg" alt="German Shepherd"><div class="title">German Shepherd</div></a>
+      <a class="card" href="https://en.wikipedia.org/wiki/Golden_Retriever" target="_blank"><img src="gg.jpeg" alt="Golden Retriever"><div class="title">Golden Retriever</div></a>
+      <a class="card" href="https://en.wikipedia.org/wiki/Beagle" target="_blank"><img src="4.jpeg" alt="Beagle"><div class="title">Beagle</div></a>
+      <a class="card" href="https://en.wikipedia.org/wiki/Shiba_Inu" target="_blank"><img src="shiba.jpeg" alt="Shiba Inu"><div class="title">Shiba Inu</div></a>
+      <a class="card" href="https://en.wikipedia.org/wiki/Indian_pariah_dog" target="_blank"><img src="1.jpeg" alt="Indian Pariah"><div class="title">Indian Pariah</div></a>
+      <!-- add more -->
+    </div>
+  </section>
+
+  <!-- Accessories -->
+  <section class="section" id="accessories">
+    <h2>Accessories — Collars, Toys, Beds & Houses</h2>
+    <div class="grid-large">
+      <a class="card item" href="https://www.amazon.in/s?k=dog+collar" target="_blank">
+        <img src="dc.jpeg" alt="Collars">
+        <div class="title">Collars & Harnesses</div>
+      </a>
+
+      <a class="card item" href="https://www.amazon.in/s?k=dog+toys" target="_blank">
+        <img src="dt.jpeg" alt="Toys">
+        <div class="title">Toys & Chewables</div>
+      </a>
+
+      <a class="card item" href="https://www.amazon.in/s?k=dog+bed" target="_blank">
+        <img src="db.jpeg" alt="Beds">
+        <div class="title">Beds & Couches</div>
+      </a>
+
+      <a class="card item" href="https://www.amazon.in/s?k=dog+house" target="_blank">
+        <img src="dh.jpeg" alt="Dog Houses">
+        <div class="title">Pet Houses</div>
+      </a>
+
+      <a class="card item" href="https://www.amazon.in/s?k=dog+clothes" target="_blank">
+        <img src="df.jpeg" alt="Fashion">
+        <div class="title">Fashion & Apparel</div>
+      </a>
+
+      <a class="card item" href="https://www.amazon.in/s?k=dog+training+gear" target="_blank">
+        <img src="dtt.jpeg" alt="Training">
+        <div class="title">Training & Activities Gear</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Activities -->
+  <section class="section" id="activities">
+    <h2>Fun Activities & Exercises</h2>
+    <div class="grid">
+      <a class="card" href="https://www.wikihow.com/Exercise-Your-Dog" target="_blank"><img src="pf.jpeg" alt=""><div class="title">Outdoor Play & Fetch</div></a>
+      <a class="card" href="https://www.akc.org/expert-advice/training/" target="_blank"><img src="dttt.jpeg" alt=""><div class="title">Training & Agility</div></a>
+      <a class="card" href="https://www.akc.org/expert-advice/lifestyle/dog-sports/" target="_blank"><img src="dcom.jpeg" alt=""><div class="title">Dog Sports & Competitions</div></a>
+    </div>
+  </section>
+
+  <!-- Celebrity dogs -->
+  <section class="section" id="celebs">
+    <h2>Famous / Celebrity Dogs (Instagram)</h2>
+    <div class="list">
+      <a class="card" href="https://www.instagram.com/jiffpom/" target="_blank"><img src="jiffpom.jpeg" alt=""><div class="title">Jiffpom (famous)</div></a>
+      <a class="card" href="https://www.instagram.com/tuna_the_dog/" target="_blank"><img src="tuna.jpg" alt=""><div class="title">Tuna (famous)</div></a>
+      <a class="card" href="https://www.instagram.com/marniethedog/" target="_blank"><img src="marnie.jpeg" alt=""><div class="title">Marnie</div></a>
+	  <a class="card" href="https://www.instagram.com/_violasnow/?hl=en" target="_blank"><img src="viola.jpg" alt=""><div class="title">Viola Snow</div></a>
+    </div>
+  </section>
+
+  <!-- Pet Cafés & Competitions -->
+  <section class="section" id="cafes">
+    <h2>Dog Cafés, Events & Competitions Nearby</h2>
+    <div class="grid">
+      <a class="card" href="https://www.google.com/search?q=dog+cafe+near+me" target="_blank"><img src="dr.jpeg" alt=""><div class="title">Dog Cafés</div></a>
+      <a class="card" href="https://www.google.com/search?q=dog+competition+near+me" target="_blank"><img src="dcom.jpeg" alt=""><div class="title">Local Competitions</div></a>
+      <a class="card" href="https://www.google.com/search?q=pet+friendly+parks+near+me" target="_blank"><img src="dp.jpeg" alt=""><div class="title">Pet-friendly Parks</div></a>
+    </div>
+  </section>
+
+  <!-- footer -->
+  <div class="footer">
+    <div style="font-weight:800">Pawtential — Dogs</div>
+    <div style="margin-top:8px;color:var(--muted)">Images & links are placeholders — swap with your assets & links.</div>
+  </div>
+</div>
+
+<!-- JavaScript: search, suggestions, routing -->
+<script>
+/*
+ Search behavior:
+ - suggestions list populated from known terms
+ - on Enter or clicking Go: if mapping provides an internal anchor -> scroll to it
+   else if mapping provides external url -> open it in new tab
+   else show "not found" toast
+*/
+
+const SEARCH_MAP = {
+  // breeds -> internal anchors or external detail pages
+  "labrador": {type:"anchor", target:"#breeds"},
+  "lab": {type:"anchor", target:"#breeds"},
+  "german shepherd": {type:"anchor", target:"#breeds"},
+  "golden retriever": {type:"anchor", target:"#breeds"},
+  "beagle": {type:"anchor", target:"#breeds"},
+  "shiba": {type:"anchor", target:"#breeds"},
+  "indian pariah": {type:"anchor", target:"#breeds"},
+
+  // accessories
+  "collar": {type:"url", target:"https://www.amazon.in/s?k=dog+collar"},
+  "toy": {type:"url", target:"https://www.amazon.in/s?k=dog+toy"},
+  "bed": {type:"url", target:"https://www.amazon.in/s?k=dog+bed"},
+  "house": {type:"url", target:"https://www.amazon.in/s?k=dog+house"},
+  "fashion": {type:"url", target:"https://www.amazon.in/s?k=dog+clothes"},
+
+  // activities / training
+  "agility": {type:"anchor", target:"#activities"},
+  "training": {type:"anchor", target:"#activities"},
+  "fetch": {type:"anchor", target:"#activities"},
+
+  // celebrity dogs
+  "jiffpom": {type:"url", target:"https://www.instagram.com/jiffpom/"},
+  "marnie": {type:"url", target:"https://www.instagram.com/marniethedog/"},
+  "tuna": {type:"url", target:"https://www.instagram.com/tuna_the_dog/"},
+  "viola snow": {type:"url", target:"https://www.instagram.com/_violasnow/?hl=en"},
+
+  // cafes & events
+  "dog cafe": {type:"anchor", target:"#cafes"},
+  "competition": {type:"anchor", target:"#cafes"},
+  "pet friendly": {type:"anchor", target:"#cafes"},
+
+  // vets (example)
+  "little paws": {type:"url", target:"https://www.google.com/maps/dir//Little+Paws+Veterinary+Clinic"},
+  "yashaswi": {type:"url", target:"https://www.google.com/maps/dir//Little+Paws+Veterinary+Clinic"},
+  "eela": {type:"url", target:"https://www.google.com/maps/dir/12.863016,74.8697784/Eela+The+Vet"}
+};
+
+// suggestions array (keys for autocomplete)
+const SUGGESTIONS = Object.keys(SEARCH_MAP);
+
+// UI refs
+const input = document.getElementById('searchInput');
+const suggestionsEl = document.getElementById('suggestions');
+const goBtn = document.getElementById('searchGo');
+
+let suggVisible = false;
+
+function renderSuggestions(list){
+  if(!list.length){ suggestionsEl.innerHTML=''; suggestionsEl.setAttribute('aria-hidden','true'); return; }
+  const box = document.createElement('div');
+  box.className = 'suggestions-list';
+  list.slice(0,8).forEach(term=>{
+    const btn = document.createElement('button');
+    btn.type='button';
+    btn.textContent = term;
+    btn.addEventListener('click', ()=> { handleSearch(term); });
+    box.appendChild(btn);
+  });
+  suggestionsEl.innerHTML=''; suggestionsEl.appendChild(box);
+  suggestionsEl.setAttribute('aria-hidden','false');
+}
+
+// filter suggestions live
+input.addEventListener('input', (e)=>{
+  const q = e.target.value.trim().toLowerCase();
+  if(!q){ renderSuggestions([]); return; }
+  const matches = SUGGESTIONS.filter(t => t.includes(q));
+  renderSuggestions(matches);
+});
+
+// handle Enter key
+input.addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter'){ e.preventDefault(); handleSearch(input.value.trim().toLowerCase()); }
+  if(e.key === 'Escape'){ input.value=''; renderSuggestions([]); }
+});
+
+// click Go
+goBtn.addEventListener('click', ()=> handleSearch(input.value.trim().toLowerCase()));
+
+// main search action
+function handleSearch(q){
+  if(!q){ alert('Type something to search (example: Labrador, collar, dog cafe)'); return; }
+
+  // exact match
+  if(SEARCH_MAP[q]){
+    const m = SEARCH_MAP[q];
+    if(m.type === 'anchor'){
+      // scroll to anchor
+      const el = document.querySelector(m.target);
+      if(el){
+        el.scrollIntoView({behavior:'smooth', block:'start'});
+        renderSuggestions([]);
+        return;
+      }
+    } else if(m.type === 'url'){
+      window.open(m.target, '_blank');
+      renderSuggestions([]);
+      return;
+    }
+  }
+
+  // fuzzy match: try find suggestion that contains q as substring
+  const fuzzy = SUGGESTIONS.find(s => s.includes(q));
+  if(fuzzy){
+    handleSearch(fuzzy);
+    return;
+  }
+
+  // no results: show helpful message and offer google search
+  const google = confirm('No direct match found. Search the web for "'+q+'"?');
+  if(google) window.open('https://www.google.com/search?q=' + encodeURIComponent(q), '_blank');
+  renderSuggestions([]);
+}
+
+// close suggestions when clicking outside
+document.addEventListener('click', (e)=>{
+  if(!document.querySelector('.searchbar').contains(e.target)) renderSuggestions([]);
+});
+</script>
+</body>
+</html>

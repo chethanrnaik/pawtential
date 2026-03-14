@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Pawtential — Pet Care • Tracking</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#081020; --navy-2:#0c1626; --ink:#ffffff; --muted:#a5b1c7;
+  --panel:#0c152a; --panel-2:#0e1a34; --ring:#1b2b52; --brand:#ff8b3d;
+  --shadow:0 12px 40px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--navy);color:var(--ink);font-family:Urbanist,system-ui,-apple-system,Segoe UI,Roboto,Arial}
+
+/* Loader */
+#loader{position:fixed;inset:0;display:grid;place-items:center;background:var(--navy);z-index:10000;transition:opacity .4s}
+.loader-inner{display:grid;gap:16px;place-items:center}
+.loader-logo{width:min(420px,70vw);display:block}
+.cat-gif{width:140px;height:90px;object-fit:contain}
+
+/* Header */
+.header{position:sticky;top:0;z-index:9000;background:var(--navy-2);border-bottom:1px solid var(--ring);box-shadow:0 8px 18px rgba(0,0,0,.28)}
+.nav{max-width:1200px;margin:0 auto;padding:12px 16px;display:flex;gap:12px;align-items:center}
+.iconbtn{background:#0f1b33;border:1px solid var(--ring);color:#dfe6ff;padding:10px 12px;border-radius:12px;cursor:pointer}
+.iconbtn:hover{background:#132246}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{width:44px;height:44px;border-radius:10px;object-fit:cover}
+.brand .name{font-weight:800;letter-spacing:.2px;font-size:20px}
+.search{flex:1;display:flex;gap:10px;align-items:center}
+.searchbar{flex:1;display:flex;background:var(--panel-2);border:1px solid var(--ring);border-radius:12px;overflow:hidden}
+.searchbar input{flex:1;background:transparent;border:0;outline:none;padding:12px 14px;color:var(--ink)}
+.searchbar button{border:0;background:transparent;color:#c9d4ff;padding:10px 12px;cursor:pointer}
+.badge{background:#0e1a34;border:1px solid var(--ring);padding:10px 12px;border-radius:12px}
+
+/* Drawer (fixed stacking, solid navy) */
+.drawer{position:fixed;inset:0;pointer-events:none;z-index:9998}
+.drawer .shade{position:absolute;inset:0;background:rgba(0,0,0,.55);opacity:0;transition:.25s;z-index:9998}
+.drawer .panel{
+  position:absolute;top:0;left:0;width:300px;height:100%;z-index:9999;
+  background:#081020;color:#fff;border-right:1px solid var(--ring);
+  transform:translateX(-100%);transition:.25s;padding:18px 16px;overflow:auto
+}
+.drawer.open{pointer-events:auto}
+.drawer.open .shade{opacity:1}
+.drawer.open .panel{transform:translateX(0)}
+.menu-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.menu-head img{width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid var(--ring)}
+.menu-title{font-weight:800;font-size:18px}
+.menu-sub{color:#c9d4ff;font-size:12px}
+.menu a{
+  display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;
+  color:#fff;text-decoration:none;background:#0f1b33;border:1px solid var(--ring);margin-top:8px
+}
+.menu a:hover{background:#132246}
+.menu svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:1.8}
+
+/* Main */
+.main{max-width:1200px;margin:18px auto 40px;padding:0 16px}
+
+/* Hero video + slogan (left, bold) */
+.hero{display:grid;grid-template-columns:1fr;gap:14px}
+.videobox{position:relative;background:var(--panel);border:1px solid var(--ring);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+.videobox video{width:100%;height:auto;max-height:54vh;object-fit:cover;display:block}
+.video-slogan{position:absolute;top:16px;left:16px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.55)}
+.video-slogan .big{font-size:40px;font-weight:800;letter-spacing:.2px;line-height:1.05}
+.video-slogan .small{font-size:20px;font-weight:600;opacity:.95;margin-top:2px}
+
+/* Monitor */
+.monitor{
+  margin-top:16px;background:var(--panel);border:1px solid var(--ring);
+  border-radius:16px;padding:16px;display:grid;grid-template-columns:220px 1fr;gap:16px;box-shadow:var(--shadow)
+}
+.monitor .photo{width:100%;height:200px;object-fit:cover;border-radius:12px;background:#0e1a34}
+.m-body{display:grid;grid-template-columns:1fr auto;gap:10px}
+.m-title{grid-column:1/-1}
+.m-name{font-weight:800;font-size:24px}
+.m-owner{color:var(--muted);font-size:13px}
+.status{display:inline-flex;align-items:center;gap:8px;background:#0e1a34;border:1px solid var(--ring);padding:8px 10px;border-radius:999px}
+.status .dot{width:10px;height:10px;border-radius:50%;background:#ef4444}
+.status.online .dot{background:#2dd4bf}
+.vitals{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.vcard{background:#0e1a34;border:1px solid var(--ring);border-radius:12px;padding:12px;text-align:center}
+.vcard .k{color:#aab7d6;font-size:12px}
+.vcard .v{font-weight:800;font-size:18px}
+.actions{display:flex;gap:10px;align-items:center}
+.btn{border:0;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:700}
+.btn.primary{background:var(--brand);color:#2a0d00}
+.btn.ghost{background:#0e1a34;border:1px solid var(--ring);color:#dfe6ff}
+
+/* Sections (STATIC) */
+.section{margin-top:22px}
+.section h2{margin:0 0 12px;font-size:28px}
+.grid-cats{display:grid;grid-template-columns:repeat(8,1fr);gap:12px}
+.cat{background:#13233d;border:1px solid var(--ring);border-radius:16px;padding:12px;text-align:center}
+.cat img{width:100%;height:110px;object-fit:cover;border-radius:12px}
+.cat .label{margin-top:8px;font-weight:800}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.card{background:#13233d;border:1px solid var(--ring);border-radius:16px;padding:12px;box-shadow:var(--shadow)}
+.card img.thumb{width:100%;height:180px;object-fit:cover;border-radius:12px}
+
+/* Blogs (STATIC) */
+.blogs{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+.post{background:#13233d;border:1px solid var(--ring);border-radius:12px;padding:10px;display:flex;gap:10px;align-items:center;margin-bottom:8px}
+.post img{width:90px;height:70px;object-fit:cover;border-radius:8px}
+
+/* Footer */
+footer{margin:28px 0 40px;text-align:center;color:#c7d2ee}
+.socials{margin-top:8px;display:flex;gap:12px;justify-content:center;align-items:center}
+.socials a{color:#9ec7ff;text-decoration:none}
+
+/* Reveal */
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .6s,transform .6s}
+.reveal.in{opacity:1;transform:translateY(0)}
+
+/* Responsive */
+@media (max-width:1020px){
+  .monitor{grid-template-columns:1fr}
+  .monitor .photo{height:180px}
+  .grid-cats{grid-template-columns:repeat(4,1fr)}
+}
+@media (max-width:640px){
+  .grid-cats{grid-template-columns:repeat(2,1fr)}
+  .video-slogan .big{font-size:32px}
+  .video-slogan .small{font-size:18px}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-inner">
+    <img class="loader-logo" src="logo.jpeg" alt="Pawtential logo">
+    <img class="cat-gif" src="Running Kitty ! Meow.gif" alt="Running cat">
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="nav">
+    <button class="iconbtn" id="openDrawer" title="Menu">☰</button>
+    <div class="brand"><img src="logo.jpeg" alt="Pawtential"><div class="name">Pawtential</div></div>
+    <div class="search">
+      <div class="searchbar" role="search">
+        <input id="q" placeholder="Search for food, toys, vets…">
+        <button title="Search">🔍</button>
+      </div>
+      <span class="badge">📍 Detect location</span>
+    </div>
+    <div class="actions">
+      <button class="iconbtn" onclick="location.href='orders.html'">🚚</button>
+      <button class="iconbtn" onclick="location.href='support.html'">📞</button>
+      <button class="iconbtn" onclick="location.href='account.html'">👤</button>
+      <button class="iconbtn" onclick="location.href='cart.html'">🛒</button>
+    </div>
+  </div>
+</header>
+
+<!-- DRAWER -->
+<div class="drawer" id="drawer">
+  <div class="shade" id="shade"></div>
+  <aside class="panel">
+    <div class="menu-head">
+      <img src="pet.jpg" alt="pet">
+      <div>
+        <div class="menu-title" id="pNameMenu">Pet name</div>
+        <div class="menu-sub" id="pOwnerMenu">Owner —</div>
+      </div>
+    </div>
+    <nav class="menu">
+      <a href="pawprints.html">
+        <!-- Paw outline -->
+        <svg viewBox="0 0 24 24"><path d="M12 20c-3 0-5-1.6-5-3.5S9 13 12 13s5 1.6 5 3.5S15 20 12 20Z"/><circle cx="5.5" cy="9" r="2.5"/><circle cx="18.5" cy="9" r="2.5"/><circle cx="9" cy="6.5" r="2.2"/><circle cx="15" cy="6.5" r="2.2"/></svg>
+        Paw Prints (tracking & health)
+      </a>
+      <a href="dogs.html">
+        <!-- Dog face -->
+        <svg viewBox="0 0 24 24"><path d="M7 9l-3-2 2-3 3 2M17 9l3-2-2-3-3 2"/><circle cx="9.5" cy="12" r="1"/><circle cx="14.5" cy="12" r="1"/><path d="M8 16c1.2 1 2.6 1.5 4 1.5s2.8-.5 4-1.5"/></svg>
+        Dogs
+      </a>
+      <a href="cats.html">
+        <!-- Cat -->
+        <svg viewBox="0 0 24 24"><path d="M4 9l2-4 3 3 3-3 3 3 3-3 2 4v7a5 5 0 01-5 5H9a5 5 0 01-5-5V9Z"/><path d="M9 14h6"/></svg>
+        Cats
+      </a>
+      <a href="small-animals.html">
+        <!-- Hamster -->
+        <svg viewBox="0 0 24 24"><circle cx="8" cy="10" r="2"/><circle cx="16" cy="10" r="2"/><path d="M4 14a8 8 0 0116 0v2a4 4 0 01-4 4H8a4 4 0 01-4-4v-2Z"/></svg>
+        Small animals
+      </a>
+      <a href="pharmacy.html">
+        <!-- Pill -->
+        <svg viewBox="0 0 24 24"><rect x="3" y="9" width="8" height="6" rx="3"/><rect x="13" y="9" width="8" height="6" rx="3"/><path d="M11 12h2"/></svg>
+        Pharmacy
+      </a>
+      <a href="vet-consultation.html">
+        <!-- Stethoscope -->
+        <svg viewBox="0 0 24 24"><path d="M6 3v6a6 6 0 0012 0V3"/><circle cx="18" cy="16" r="2"/><path d="M18 18v2a4 4 0 01-4 4h-1"/></svg>
+        Vet consultation
+      </a>
+      <a href="pet-adoption.html">
+        <!-- House + paw -->
+        <svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a2 2 0 0 1-2 2h-3v-6H8v6H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="1.2"/><circle cx="9.5" cy="11.5" r="1"/><circle cx="14.5" cy="11.5" r="1"/><path d="M10 15c.6.5 1.3.8 2 .8s1.4-.3 2-.8"/></svg>
+        Pet adoption
+      </a>
+      <a href="customer-care.html">
+        <!-- Headset -->
+        <svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0116 0v5a3 3 0 01-3 3h-2v-6h5"/><path d="M7 14H5a2 2 0 00-2 2v1a2 2 0 002 2h2v-5z"/></svg>
+        Customer care
+      </a>
+    </nav>
+  </aside>
+</div>
+
+<main class="main">
+
+  <!-- HERO -->
+  <section class="hero reveal">
+    <div class="videobox">
+      <video src="hero.mp4" autoplay muted loop playsinline></video>
+      <div class="video-slogan">
+        <div class="big">Pawsitively</div>
+        <div class="small">the best care.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MONITOR -->
+  <section class="monitor reveal">
+    <img id="petPhoto" class="photo" src="pet.jpg" alt="Pet photo">
+    <div class="m-body">
+      <div class="m-title">
+        <div class="m-name" id="petNameDisp">Bella</div>
+        <div class="m-owner" id="ownerLineDisp">Owner: Prajwal Naik • Age: 8 years • Breed: Golden Labrador • Color: Fawn • Device: collar-001</div>
+      </div>
+      <div class="status" id="statusEl"><span class="dot"></span><span id="statusText">Offline</span></div>
+      <div class="vitals">
+        <div class="vcard"><div class="k">Temperature</div><div class="v" id="tempVal">-- °C</div></div>
+        <div class="vcard"><div class="k">Heart Rate</div><div class="v" id="hrVal">-- bpm</div></div>
+        <div class="vcard"><div class="k">SpO₂</div><div class="v" id="spVal">-- %</div></div>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="openTracker">🐾 Paw Prints</button>
+        <button class="btn ghost" id="editProfile">Edit profile</button>
+        <input id="uploadPhoto" type="file" accept="image/*" hidden>
+      </div>
+    </div>
+  </section>
+
+  <!-- EVERYDAY ESSENTIALS (STATIC) -->
+  <section class="section reveal">
+    <h2>Everyday essentials</h2>
+    <div class="grid-cats">
+      <div class="cat"><img src="dogg_food.jpg." alt=""><div class="label">Dog food</div></div>
+      <div class="cat"><img src="catfood.jpg." alt=""><div class="label">Cat food</div></div>
+      <div class="cat"><img src="treats.jpg." alt=""><div class="label">Treats</div></div>
+      <div class="cat"><img src="litter.jpeg." alt=""><div class="label">Litter supplies</div></div>
+      <div class="cat"><img src="dog_food.jpg.png" alt=""><div class="label">Premium food</div></div>
+      <div class="cat"><img src="cat_food.jpg.png" alt=""><div class="label">Fresh food</div></div>
+      <div class="cat"><img src="wellness.jpg.png" alt=""><div class="label">Food supplements</div></div>
+      <div class="cat"><img src="toys.jpg.png" alt=""><div class="label">GPS tracker</div></div>
+    </div>
+  </section>
+
+  <!-- WELLNESS (STATIC) -->
+  <section class="section reveal">
+    <h2>All-round Wellness</h2>
+    <div class="grid-3">
+      <div class="card"><img class="thumb" src="wellness.jpg.png" alt=""><div style="padding:10px"><h3 style="margin:0 0 6px">Skin care</h3><p style="color:#cfe0ff;margin:0">Extra 12% OFF • Code: PAWNEW</p></div></div>
+      <div class="card"><img class="thumb" src="toys.jpg.png" alt=""><div style="padding:10px"><h3 style="margin:0 0 6px">Tick & fleas</h3><p style="color:#cfe0ff;margin:0">Save ₹250 • Code: SAVE250</p></div></div>
+      <div class="card"><img class="thumb" src="dog_food.jpg.png" alt=""><div style="padding:10px"><h3 style="margin:0 0 6px">Joint care</h3><p style="color:#cfe0ff;margin:0">Extra 5% • Code: HENLO</p></div></div>
+    </div>
+  </section>
+
+  <!-- FEST BANNER (STATIC) -->
+  <section class="section reveal">
+    <img src="toys.jpg.png" style="width:100%;height:280px;object-fit:cover;border-radius:16px;border:1px solid var(--ring);box-shadow:var(--shadow)" alt="">
+  </section>
+
+  <!-- BLOGS (STATIC) -->
+  <section class="section reveal">
+    <h2 style="text-align:center">Blogs</h2>
+    <div class="blogs">
+      <div class="card"><img class="thumb" src="cat_food.jpg.png" style="height:360px" alt=""></div>
+      <div>
+        <div class="post"><img src="dog_food.jpg.png" alt=""><div>How to bathe a dog at home</div></div>
+        <div class="post"><img src="toys.jpg.png" alt=""><div>Smelly cat? Try this</div></div>
+        <div class="post"><img src="wellness.jpg.png" alt=""><div>Defeating matted fur</div></div>
+        <div class="post"><img src="dog_food.jpg.png" alt=""><div>Dandruff in dogs: causes</div></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="reveal" style="margin-top:26px">
+    <div style="font-weight:800;color:#e8f1ff">“Paws, Play, Protect — unlock your pet’s full Pawtential.”</div>
+    <div class="socials">
+      <a href="https://instagram.com/yourpage" target="_blank">Instagram</a> •
+      <a href="https://facebook.com/yourpage" target="_blank">Facebook</a> •
+      <span>Customer Care: <a href="tel:+919876543210">+91 98765 43210</a></span>
+    </div>
+  </footer>
+</main>
+
+<script>
+/* Loader */
+window.addEventListener('load',()=>{ setTimeout(()=>{ const l=document.getElementById('loader'); l.style.opacity='0'; setTimeout(()=>l.remove(),420); },3000);});
+
+/* Drawer */
+const drawer=document.getElementById('drawer');
+document.getElementById('openDrawer').onclick=()=>drawer.classList.add('open');
+document.getElementById('shade').onclick=()=>drawer.classList.remove('open');
+
+/* Reveal on scroll */
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}})},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* ThingSpeak placeholders (edit these or pass via tracker query) */
+const THINGSPEAK_CHANNEL='3075886';
+const THINGSPEAK_READ_KEY='DPR1MB0OEPJ92V0Q';
+
+/* Pet profile (local storage) */
+const defaults={name:'Bella',owner:'Prajwal Naik',age:'8 years',breed:'Golden Labrador',color:'Fawn',device:'collar-001'};
+function loadProfile(){
+  const p=JSON.parse(localStorage.getItem('paw_profile')||'null')||defaults;
+  petNameDisp.textContent=p.name;
+  ownerLineDisp.textContent=`Owner: ${p.owner} • Age: ${p.age} • Breed: ${p.breed} • Color: ${p.color} • Device: ${p.device}`;
+  pNameMenu.textContent=p.name; pOwnerMenu.textContent=p.owner;
+  const saved=localStorage.getItem('paw_photo'); if(saved){petPhoto.src=saved;}
+}
+function editProfile(){
+  const c=JSON.parse(localStorage.getItem('paw_profile')||'null')||defaults;
+  const name=prompt('Pet name',c.name)??c.name;
+  const owner=prompt('Owner name',c.owner)??c.owner;
+  const age=prompt('Age',c.age)??c.age;
+  const breed=prompt('Breed',c.breed)??c.breed;
+  const color=prompt('Color',c.color)??c.color;
+  const device=prompt('Device id/name',c.device)??c.device;
+  localStorage.setItem('paw_profile',JSON.stringify({name,owner,age,breed,color,device}));
+  loadProfile();
+}
+document.getElementById('editProfile').onclick=()=>{ const ok=confirm('Edit text fields?\nOK = edit\nCancel = change photo'); if(ok) editProfile(); else uploadPhoto.click(); };
+uploadPhoto.addEventListener('change',e=>{ const f=e.target.files[0]; if(!f) return; const rd=new FileReader(); rd.onload=()=>{localStorage.setItem('paw_photo',rd.result); petPhoto.src=rd.result;}; rd.readAsDataURL(f); });
+loadProfile();
+
+/* Status demo + vitals demo (replace with live if needed) */
+function setStatus(on){const el=statusEl,tx=statusText; if(on){el.classList.add('online');tx.textContent='Connected';} else {el.classList.remove('online');tx.textContent='Offline';}}
+let s=false; setInterval(()=>{s=!s; setStatus(s);},10000);
+function demoVitals(){tempVal.textContent=(36+Math.random()*3).toFixed(1)+' °C'; hrVal.textContent=(70+Math.random()*40|0)+' bpm'; spVal.textContent=(96+Math.random()*3|0)+' %';}
+demoVitals(); setInterval(demoVitals,4000);
+
+/* Paw Prints link → tracker.html with params */
+document.getElementById('openTracker').onclick=()=>{
+  const url = `tracker.html?channel=${encodeURIComponent(THINGSPEAK_CHANNEL)}&key=${encodeURIComponent(THINGSPEAK_READ_KEY)}`;
+  location.href = url;
+};
+
+
+
+
+
+
+// ThingSpeak channel details
+const channelID = "3075886";
+const readAPIKey = "DPR1MB0OEPJ92V0Q";
+const url = `https://api.thingspeak.com/channels/${channelID}/feeds.json?api_key=${readAPIKey}&results=1`;
+
+async function fetchData() {
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    const lastEntry = data.feeds[0];
+
+    // Update values on page
+    document.getElementById("tempVal").innerText = lastEntry.field1 + " °C";
+    document.getElementById("hrVal").innerText  = lastEntry.field2 + " bpm";
+    document.getElementById("spVal").innerText  = lastEntry.field3 + " %";
+
+    // Status change
+    const statusEl = document.getElementById("statusEl");
+    const statusText = document.getElementById("statusText");
+    if (lastEntry.field4 === "online") {
+      statusEl.classList.add("online");
+      statusText.innerText = "Online";
+    } else {
+      statusEl.classList.remove("online");
+      statusText.innerText = "Offline";
+    }
+
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+}
+
+// Fetch every 10 seconds
+setInterval(fetchData, 10000);
+fetchData();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pawtential — Delivery Tracking</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root{
+  --ink:#ffffff;
+  --muted:#cfc6ff;
+  --neon:#b05bff;
+  --neon-2:#8a3bff;
+  --ring: rgba(176,91,255,0.18);
+  --shadow: 0 20px 60px rgba(16,6,28,0.7);
+}
+
+/* RESET */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:Urbanist,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+  color:var(--ink);
+  background:#050009 url("pawtential/stock-vector-dark-abstract-welcome-page-with-purple-blue-waves-2633393175.jpg") center/cover fixed;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* HEADER */
+header{
+  position:sticky;top:0;z-index:50;
+  padding:14px 18px;
+  background:linear-gradient(180deg,rgba(5,0,10,0.8),rgba(5,0,10,0.45));
+  border-bottom:1px solid rgba(255,255,255,0.05);
+  backdrop-filter:blur(7px);
+}
+.header-inner{
+  max-width:1200px;
+  margin:0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.brand{
+  display:flex;align-items:center;gap:10px;
+  cursor:pointer;
+}
+.brand img{
+  width:40px;height:40px;border-radius:10px;object-fit:cover;
+  box-shadow:0 10px 30px rgba(0,0,0,0.6);
+}
+.brand span{
+  font-weight:800;font-size:20px;
+}
+.header-inner a.back-link{
+  color:var(--muted);
+  text-decoration:none;
+  display:flex;align-items:center;gap:6px;
+  font-size:14px;
+}
+.header-inner a.back-link:hover{color:#fff}
+
+/* MAIN LAYOUT */
+main{
+  max-width:1200px;
+  margin:22px auto 40px;
+  padding:0 16px;
+  display:grid;
+  grid-template-columns:1.1fr 1.4fr;
+  gap:18px;
+}
+
+/* LEFT – ORDER/ADDRESS */
+.panel{
+  background:rgba(8,0,16,0.85);
+  border-radius:18px;
+  padding:18px;
+  border:1px solid var(--ring);
+  box-shadow:var(--shadow);
+}
+.panel h2{
+  font-size:22px;
+  margin-bottom:10px;
+}
+.sub{
+  color:var(--muted);
+  font-size:14px;
+  margin-bottom:16px;
+}
+.order-summary{
+  margin-top:8px;
+}
+.order-summary h3{
+  font-size:18px;
+  margin-bottom:8px;
+}
+.order-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:6px 0;
+  font-size:14px;
+  border-bottom:1px dashed rgba(255,255,255,0.06);
+}
+.order-item:last-child{border-bottom:0}
+.order-item span.name{color:#fff}
+.order-item span.meta{color:var(--muted);font-size:13px}
+.total-row{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:10px;
+  padding-top:8px;
+  border-top:1px solid rgba(255,255,255,0.18);
+  font-weight:800;
+}
+.badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:11px;
+  background:linear-gradient(90deg,rgba(176,91,255,0.3),rgba(138,59,255,0.2));
+}
+
+/* Address + instructions */
+.address-block{
+  margin-top:14px;
+  padding:12px;
+  border-radius:12px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+}
+.address-block h3{
+  font-size:16px;margin-bottom:4px;
+}
+.address-text{
+  font-size:14px;color:#f4eaff;
+}
+.instructions{
+  margin-top:10px;
+  padding-top:8px;
+  border-top:1px dashed rgba(255,255,255,0.12);
+  font-size:13px;
+  color:var(--muted);
+}
+.instructions strong{color:#fff}
+
+/* Delivery meta */
+.meta-grid{
+  margin-top:14px;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.meta-card{
+  padding:10px 12px;
+  border-radius:12px;
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.08);
+  font-size:13px;
+}
+.meta-label{color:var(--muted);font-size:12px;margin-bottom:2px}
+.meta-value{font-weight:700}
+
+/* RIGHT – MAP + TIMELINE */
+.map-panel{
+  background:rgba(8,0,16,0.9);
+  border-radius:18px;
+  padding:18px;
+  border:1px solid var(--ring);
+  box-shadow:var(--shadow);
+}
+.map-panel h2{
+  font-size:22px;margin-bottom:6px;
+}
+.status-pill{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:12px;
+  background:rgba(0,255,170,0.12);
+  color:#8fffe0;
+  margin-bottom:12px;
+}
+.status-pill i{font-size:13px}
+
+/* Map */
+.map{
+  position:relative;
+  margin-top:6px;
+  border-radius:16px;
+  height:260px;
+  background:
+    radial-gradient(circle at 10% 20%,rgba(176,91,255,0.25),transparent 55%),
+    radial-gradient(circle at 80% 70%,rgba(92,225,255,0.2),transparent 55%),
+    #050019;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,0.08);
+}
+.map-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px),
+                   linear-gradient(180deg,rgba(255,255,255,0.04) 1px,transparent 1px);
+  background-size:40px 40px;
+  opacity:0.25;
+}
+.route-line{
+  position:absolute;left:10%;right:10%;top:55%;
+  height:4px;
+  background:linear-gradient(90deg,rgba(176,91,255,0.6),rgba(92,225,255,0.7));
+  border-radius:999px;
+}
+.route-stop{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:12px;height:12px;border-radius:50%;
+  background:#050019;
+  border:2px solid #fff;
+}
+.route-stop:nth-child(1){left:0;}
+.route-stop:nth-child(2){left:50%;transform:translate(-50%,-50%);}
+.route-stop:nth-child(3){right:0;}
+
+.truck{
+  position:absolute;top:50%;transform:translate(-50%,-50%);
+  width:40px;height:24px;border-radius:8px;
+  background:linear-gradient(90deg,var(--neon),var(--neon-2));
+  box-shadow:0 0 18px rgba(176,91,255,0.7);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;
+  animation:drive 9s linear infinite;
+}
+.truck::before, .truck::after{
+  content:"";position:absolute;bottom:-6px;
+  width:10px;height:10px;border-radius:50%;
+  background:#0b0b12;border:2px solid #e2ddff;
+}
+.truck::before{left:6px;}
+.truck::after{right:6px;}
+
+@keyframes drive{
+  0%{left:10%;}
+  45%{left:50%;}
+  100%{left:90%;}
+}
+
+/* Map labels */
+.map-label{
+  position:absolute;
+  font-size:11px;
+  padding:4px 8px;
+  border-radius:999px;
+  background:rgba(5,0,15,0.86);
+  border:1px solid rgba(255,255,255,0.12);
+  color:#f5ecff;
+}
+.map-label.origin{left:8%;top:30%;}
+.map-label.hub{left:50%;top:22%;transform:translateX(-50%);}
+.map-label.dest{right:8%;top:30%;}
+
+/* TIMELINE */
+.timeline{
+  margin-top:16px;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+}
+.step{
+  padding:10px;
+  border-radius:12px;
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.08);
+  font-size:12px;
+}
+.step strong{display:block;margin-bottom:4px;font-size:13px;}
+.step span{color:var(--muted);font-size:11px;}
+.step.active{
+  border-color:var(--neon);
+  box-shadow:0 0 20px rgba(176,91,255,0.4);
+}
+
+/* Delivery notes */
+.notes{
+  margin-top:14px;
+  font-size:12px;
+  color:var(--muted);
+}
+.notes ul{margin:6px 0 0 18px;}
+.notes li{margin-bottom:3px;}
+
+/* Responsive */
+@media (max-width:900px){
+  main{grid-template-columns:1fr;gap:14px;}
+  .map{height:230px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand" onclick="location.href='index.html'">
+      <img src="logo.jpeg" alt="Pawtential logo">
+      <span>Pawtential</span>
+    </div>
+    <a href="orders.html" class="back-link">
+      <i class="fa fa-chevron-left"></i> Back to orders
+    </a>
+  </div>
+</header>
+
+<main>
+  <!-- LEFT: ORDER & ADDRESS -->
+  <section class="panel">
+    <h2>Order #PT-8743</h2>
+    <div class="sub">Thank you! Your goodies are on the way 🐾</div>
+
+    <div class="order-summary">
+      <h3>Items in this delivery</h3>
+
+      <div class="order-item">
+        <span class="name">Royal Paws Adult Dog Food</span>
+        <span class="meta">2 kg × 1</span>
+      </div>
+      <div class="order-item">
+        <span class="name">Ocean Bites Cat Kibble</span>
+        <span class="meta">1.2 kg × 1</span>
+      </div>
+      <div class="order-item">
+        <span class="name">Soft Plush Bone Toy</span>
+        <span class="meta">Size M × 1</span>
+      </div>
+      <div class="order-item">
+        <span class="name">Reflective GPS Collar</span>
+        <span class="meta">Collar-001 × 1</span>
+      </div>
+
+      <div class="total-row">
+        <span>Total (incl. taxes)</span>
+        <span>₹ 2,749</span>
+      </div>
+
+      <div style="margin-top:6px;">
+        <span class="badge"><i class="fa fa-credit-card"></i> Paid online • UPI</span>
+      </div>
+    </div>
+
+    <div class="address-block">
+      <h3><i class="fa fa-location-dot" style="margin-right:6px;color:var(--neon);"></i>Delivery address</h3>
+      <div class="address-text">
+        Srinivas Institute of Technology,<br>
+        Valachil, Mangalore – 575001<br>
+        Karnataka, India
+      </div>
+
+      <div class="instructions">
+        <strong>Delivery instructions:</strong><br>
+        Please <strong>leave at CSE Department, Section B</strong>. Call on arrival if gate access is required.
+      </div>
+    </div>
+
+    <div class="meta-grid">
+      <div class="meta-card">
+        <div class="meta-label">Expected delivery</div>
+        <div class="meta-value">Today • 3:30 – 4:00 PM</div>
+      </div>
+      <div class="meta-card">
+        <div class="meta-label">Delivery partner</div>
+        <div class="meta-value">Pawtential Express</div>
+      </div>
+      <div class="meta-card">
+        <div class="meta-label">Contact rider</div>
+        <div class="meta-value">+91 77951 35938</div>
+      </div>
+      <div class="meta-card">
+        <div class="meta-label">Support</div>
+        <div class="meta-value">pawtential0@gmail.com</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RIGHT: MAP & TIMELINE -->
+  <section class="map-panel">
+    <h2>Live delivery tracking</h2>
+    <div class="status-pill">
+      <i class="fa fa-truck-fast"></i> Out for delivery • Heading to CSE Dept, Section B
+    </div>
+
+    <div class="map">
+      <div class="map-grid"></div>
+
+      <div class="route-line">
+        <div class="route-stop"></div>
+        <div class="route-stop"></div>
+        <div class="route-stop"></div>
+        <div class="truck">🚚</div>
+      </div>
+
+      <div class="map-label origin">
+        <strong>Warehouse</strong><br><span style="font-size:10px;color:var(--muted)">Mangalore Hub</span>
+      </div>
+      <div class="map-label hub">
+        <strong>City Facility</strong><br><span style="font-size:10px;color:var(--muted)">Sorting center</span>
+      </div>
+      <div class="map-label dest">
+        <strong>SIT Valachil</strong><br><span style="font-size:10px;color:var(--muted)">CSE Dept • Section B</span>
+      </div>
+    </div>
+
+    <div class="timeline">
+      <div class="step">
+        <strong>Ordered</strong>
+        <span>08:15 AM • Payment confirmed</span>
+      </div>
+      <div class="step">
+        <strong>Arrived at facility</strong>
+        <span>10:05 AM • Sorted at Mangalore hub</span>
+      </div>
+      <div class="step active">
+        <strong>Dispatched</strong>
+        <span>01:30 PM • Rider picked up the parcel</span>
+      </div>
+      <div class="step">
+        <strong>Delivered</strong>
+        <span>Pending • OTP will be required</span>
+      </div>
+    </div>
+
+    <div class="notes">
+      <strong>Delivery notes</strong>
+      <ul>
+        <li>Rider will call you on arrival at the <b>CSE Department, Section B</b>.</li>
+        <li>Inspect food packaging seals before opening. Do not accept if tampered.</li>
+        <li>For returns or issues, go to <b>Orders &gt; Help</b> or email <b>pawtential0@gmail.com</b>.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+</body>
+</html>

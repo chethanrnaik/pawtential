@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Search — Pawtential</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root{
+  --ink:#ffffff;
+  --muted:#cfc6ff;
+  --neon:#b05bff;
+  --neon-2:#8a3bff;
+  --bg:#050009;
+  --card: rgba(255,255,255,0.03);
+  --ring: rgba(176,91,255,0.12);
+  --shadow: 0 18px 48px rgba(16,6,28,0.7);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background: var(--bg) url("stock-vector-dark-abstract-welcome-page-with-purple-blue-waves-2633393175.jpg") center/cover fixed;
+  color:var(--ink);
+  font-family: Urbanist, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:40px;
+}
+.container{max-width:1100px;margin:18px auto;padding:18px}
+
+/* header / search box */
+.header{
+  display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:18px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+  border:1px solid rgba(255,255,255,0.03); padding:12px;border-radius:12px; box-shadow:var(--shadow);
+}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{width:48px;height:48px;border-radius:10px;object-fit:cover}
+.brand .title{font-weight:800;font-size:18px}
+.searchbar{flex:1;display:flex;align-items:center;gap:10px;margin-left:8px}
+.searchbar input{flex:1;padding:12px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--ink);outline:none;font-size:15px}
+.searchbar button{padding:10px 14px;border-radius:10px;background:linear-gradient(90deg,var(--neon),var(--neon-2));border:0;color:#021217;font-weight:800;cursor:pointer}
+
+/* results */
+.meta{margin:14px 0;color:var(--muted);font-size:14px}
+.results{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid rgba(255,255,255,0.04);padding:12px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.5);display:flex;gap:12px;align-items:flex-start;transition:transform .14s}
+.card:hover{transform:translateY(-6px)}
+.thumb{width:84px;height:72px;flex:0 0 84px;border-radius:8px;object-fit:cover;border:1px solid rgba(255,255,255,0.04)}
+.card .title{font-weight:800;color:var(--ink);margin-bottom:6px}
+.card .sub{font-size:13px;color:var(--muted);margin-bottom:8px}
+.card .tag{display:inline-block;padding:6px 8px;border-radius:8px;background:linear-gradient(90deg,var(--neon),var(--neon-2));color:#021217;font-weight:700;font-size:13px}
+
+/* "No results" */
+.empty{padding:28px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));border:1px solid rgba(255,255,255,0.04);text-align:center;color:var(--muted);}
+
+/* suggestion list */
+.suggestions{display:flex;flex-wrap:wrap;gap:10px}
+.suggest{padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.02);cursor:pointer;color:var(--ink)}
+
+/* highlight */
+.hl{background:linear-gradient(90deg, rgba(176,91,255,0.16), rgba(138,59,255,0.08));padding:2px 4px;border-radius:4px}
+
+/* footer */
+.footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
+@media (max-width:640px){
+  .searchbar input{font-size:14px}
+  .thumb{width:72px;height:64px}
+}
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="header" role="banner">
+      <div class="brand" onclick="location.href='index.html'">
+        <img src="logo.jpeg" alt="logo">
+        <div>
+          <div class="title">Pawtential — Search</div>
+          <div style="font-size:12px;color:var(--muted)">Find products, categories, blogs & external links</div>
+        </div>
+      </div>
+
+      <div class="searchbar" role="search">
+        <input id="q" placeholder="Search for dog food, labrador, flea treatment…" aria-label="Search term">
+        <button id="doSearch" aria-label="Search">Search</button>
+      </div>
+    </div>
+
+    <div id="meta" class="meta"></div>
+
+    <div id="resultsWrap">
+      <!-- results injected here -->
+    </div>
+
+    <div class="footer">Tip: Click a result to open that page (external links open in a new tab).</div>
+  </div>
+
+<script>
+/*
+ Client-side search.
+ User chose option B: open external links for product-type items.
+ We'll use a local dataset below (title, tags, url, img, type).
+*/
+
+const data = [
+  // Everyday essentials -> external links (user-provided)
+  { id:1, title:"Dog Food", tags:["dog","food","dog food","pet food"], url:"https://www.amazon.in/Dog-Food/b?ie=UTF8&node=4771395031", img:"dogg_food.jpg", type:"external" },
+  { id:2, title:"Cat Food", tags:["cat","food","cat food"], url:"https://www.amazon.in/Cat-Food/b?ie=UTF8&node=4771382031", img:"catfood.jpg", type:"external" },
+  { id:3, title:"Treats (cats)", tags:["treats","cat treats","treats for cats"], url:"https://www.amazon.in/s?k=treats+for+cats&adgrpid=58071908639&ext_vrnc=hi&hvadid=294136000991&hvdev=c&hvlocphy=9303595&hvnetw=g&hvqmt=e&hvrand=17177382721730951535&hvtargid=kwd-55567441&hydadcr=13674_1812398&mcid=8492bf2ed1323dd6b984c9a098d5c75f&tag=googinhydr1-21&ref=pd_sl_35xtdtz87a_e", img:"treats.jpg", type:"external" },
+  { id:4, title:"Litter supplies", tags:["litter","cat litter","litter supplies"], url:"https://www.amazon.in/b?ie=UTF8&node=66377182031", img:"litter.jpeg", type:"external" },
+  { id:5, title:"Premium Dog Food", tags:["premium food","premium dog food"], url:"https://www.amazon.in/Dog-Food/b?ie=UTF8&node=4771395031", img:"premium.jpeg", type:"external" },
+  { id:6, title:"Fresh Pet Food", tags:["fresh food","fresh pet food"], url:"https://www.amazon.in/pet-food-fresh/s?k=pet+food+fresh", img:"fresh food.jpeg", type:"external" },
+  { id:7, title:"Food Supplements", tags:["supplements","food supplements"], url:"https://www.amazon.in/gp/bestsellers/pet-supplies/4771627031", img:"food suplement.png", type:"external" },
+  { id:8, title:"GPS Tracker", tags:["gps","tracker","tracker device","pet tracker"], url:"https://www.amazon.in/pet-tracker/s?k=pet+tracker", img:"gps track.jpeg", type:"external" },
+
+  // Wellness -> external resources
+  { id:9, title:"Skin care products", tags:["skin","skin care","skin care dogs"], url:"https://headsupfortails.com/collections/dog-health-hygiene-skin-coat?srsltid=AfmBOooc2ptCtICDnM3l58UR0MgRftmk835xmCV32b5I3k6WHSv-aeAo", img:"skin care.png", type:"external" },
+  { id:10, title:"Tick & Flea prevention info", tags:["tick","flea","tick fleas","flea treatment"], url:"https://www.petmd.com/dog/general-health/flea-and-tick-prevention-and-treatment-dogs", img:"tick and fleas.png", type:"external" },
+  { id:11, title:"Joint care supplements", tags:["joint","joint care","joint supplements"], url:"https://greennpaws.in/", img:"joint.jpeg", type:"external" },
+
+  // Blogs / videos
+  { id:12, title:"How to bathe a dog at home (video)", tags:["bathe","bathe dog","bath dog"], url:"https://www.youtube.com/watch?v=Q84wC2CBaaw&t=47s", img:"bath.png", type:"external" },
+  { id:13, title:"Smelly cat? Try this (video)", tags:["smelly cat","cat smell"], url:"https://www.youtube.com/watch?v=N89A66gDvu8&t=199s", img:"smelly.png", type:"external" },
+  { id:14, title:"Defeating matted fur (video)", tags:["matted fur","fur","matting"], url:"https://www.youtube.com/watch?v=ktHrJrQFDCY", img:"fur.png", type:"external" },
+  { id:15, title:"Dandruff in dogs: causes (video)", tags:["dandruff","dog dandruff"], url:"https://www.youtube.com/watch?v=AtZ-pOFsL9U", img:"dandruff.png", type:"external" },
+
+  // Internal pages (site navigation / categories)
+  { id:20, title:"Paw Prints (tracking & health)", tags:["paw prints","tracking","health","tracker"], url:"pawprints.html", img:"gps track.jpeg", type:"internal" },
+  { id:21, title:"Dogs (category)", tags:["dogs","dog","breeds","puppy"], url:"dogs.html", img:"dogg_food.jpg", type:"internal" },
+  { id:22, title:"Cats (category)", tags:["cats","cat","breeds"], url:"cats.html", img:"catfood.jpg", type:"internal" },
+  { id:23, title:"Small animals", tags:["small animals","hamster","rabbit","guinea pig"], url:"small-animals.html", img:"toys.jpg.png", type:"internal" },
+  { id:24, title:"Pharmacy", tags:["pharmacy","medicine","pet pharmacy"], url:"pharmacy.html", img:"wellness.jpg.png", type:"internal" },
+  { id:25, title:"Vet consultation", tags:["vet","veterinarian","consultation","vet consultation"], url:"vet-consultation.html", img:"vet.png", type:"internal" },
+  { id:26, title:"Pet adoption", tags:["adoption","adopt","stray","rescue"], url:"pet-adoption.html", img:"adopt.png", type:"internal" },
+  { id:27, title:"Customer care", tags:["support","customer care","help"], url:"customer-care.html", img:"support general.jpg", type:"internal" },
+  { id:28, title:"Account", tags:["account","profile","login"], url:"account.html", img:"logo.jpeg", type:"internal" },
+  { id:29, title:"Alerts / Inbox", tags:["alerts","inbox","notifications"], url:"alerts.html", img:"Running Kitty ! Meow.gif", type:"internal" }
+];
+
+// utility: get query param
+function getQuery(){ const p = new URLSearchParams(location.search); return (p.get('q')||'').trim(); }
+
+// sanitize & highlight helper
+function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]); }
+function highlight(text, term){
+  if(!term) return escapeHtml(text);
+  const re = new RegExp('('+term.split(/\s+/).map(t=>t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','ig');
+  return escapeHtml(text).replace(re, m=>`<span class="hl">${m}</span>`);
+}
+
+// search logic: tokens match title or tags
+function search(q){
+  if(!q) return [];
+  const qTokens = q.toLowerCase().split(/\s+/).filter(Boolean);
+  return data
+    .map(item=>{
+      // compute score: how many tokens appear in title/tags
+      const hay = (item.title + ' ' + (item.tags||[]).join(' ')).toLowerCase();
+      let score = 0;
+      for(const t of qTokens) if(hay.includes(t)) score++;
+      return { item, score };
+    })
+    .filter(r=>r.score>0)
+    .sort((a,b)=>b.score - a.score || a.item.title.localeCompare(b.item.title))
+    .map(r=>r.item);
+}
+
+// render results
+function renderResults(q){
+  const wrap = document.getElementById('resultsWrap');
+  const meta = document.getElementById('meta');
+  wrap.innerHTML = '';
+  if(!q){
+    meta.innerHTML = `<div class="meta">Popular searches: <div class="suggestions">
+      <span class="suggest" data-q="Dog Food">Dog Food</span>
+      <span class="suggest" data-q="GPS Tracker">GPS Tracker</span>
+      <span class="suggest" data-q="Tick & Flea">Tick & Flea</span>
+      <span class="suggest" data-q="Pet adoption">Pet adoption</span>
+    </div></div>`;
+    // show a few highlighted categories as suggestion cards
+    const html = `
+      <div class="results">
+        ${[21,22,26,20].map(id=>{
+          const it = data.find(x=>x.id===id);
+          return `<a class="card" href="${it.url}" ${it.type==='external'?'target="_blank"':''}>
+            <img class="thumb" src="${it.img}" alt="${escapeHtml(it.title)}">
+            <div>
+              <div class="title">${escapeHtml(it.title)}</div>
+              <div class="sub">${escapeHtml(it.tags.join(', '))}</div>
+              <div class="tag">${it.type === 'external'? 'External' : 'Page'}</div>
+            </div>
+          </a>`;
+        }).join('')}
+      </div>`;
+    wrap.innerHTML = html;
+    // wire suggestions click
+    document.querySelectorAll('.suggest').forEach(s=>s.onclick = ()=>{ document.getElementById('q').value = s.dataset.q; doSearch(); });
+    return;
+  }
+
+  const results = search(q);
+  meta.innerHTML = `<div class="meta">Search results for <strong>${escapeHtml(q)}</strong> — ${results.length} found</div>`;
+
+  if(results.length === 0){
+    wrap.innerHTML = `<div class="empty">No results found for <strong>${escapeHtml(q)}</strong>. Try different keywords, or check spelling.</div>`;
+    return;
+  }
+
+  const html = `<div class="results">` + results.map(it=>{
+    const url = it.url;
+    const isExternal = /^https?:\/\//i.test(url) || it.type === 'external';
+    return `<a class="card" href="${url}" ${isExternal? 'target="_blank" rel="noopener noreferrer"': ''}>
+      <img class="thumb" src="${it.img}" alt="${escapeHtml(it.title)}">
+      <div>
+        <div class="title">${highlight(it.title, q)}</div>
+        <div class="sub">${highlight((it.tags||[]).slice(0,4).join(', '), q)}</div>
+        <div style="margin-top:8px"><span class="tag">${isExternal? 'External Link' : 'Site Page'}</span></div>
+      </div>
+    </a>`;
+  }).join('') + `</div>`;
+  wrap.innerHTML = html;
+}
+
+// hook search input + url param
+const input = document.getElementById('q');
+const button = document.getElementById('doSearch');
+
+function doSearch(){
+  const val = input.value.trim();
+  // update URL (without reloading)
+  const u = new URL(location.href);
+  if(val) u.searchParams.set('q', val); else u.searchParams.delete('q');
+  history.replaceState({},'',u.toString());
+  renderResults(val);
+}
+
+button.addEventListener('click', doSearch);
+input.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ doSearch(); }});
+
+// suggestions click (delegated)
+document.addEventListener('click', (e)=>{
+  const s = e.target.closest('.suggest');
+  if(s){ input.value = s.dataset.q; doSearch(); }
+});
+
+// run initial query from URL
+const initial = (new URLSearchParams(location.search)).get('q') || '';
+input.value = initial;
+renderResults(initial);
+</script>
+</body>
+</html>

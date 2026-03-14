@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pet Adoption — Pawtential</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root{
+  --ink:#ffffff;
+  --muted:#cfc6ff;
+  --neon:#b05bff;
+  --neon-2:#8a3bff;
+  --ring: rgba(176,91,255,0.12);
+  --shadow: 0 20px 60px rgba(16,6,28,0.7);
+}
+
+body{
+  margin:0;
+  font-family:Urbanist;
+  background:#050009 url("stock-vector-dark-abstract-welcome-page-with-purple-blue-waves-2633393175.jpg") center/cover fixed;
+  color:var(--ink);
+}
+
+/* HEADER */
+header{
+  padding:18px;
+  text-align:center;
+  font-size:32px;
+  font-weight:800;
+  color:white;
+  background:linear-gradient(180deg,rgba(10,0,16,0.65),rgba(10,0,16,0.35));
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+
+/* SECTIONS */
+.section{
+  max-width:1200px;
+  margin:26px auto;
+  padding:0 16px;
+}
+.section h2{
+  font-size:28px;
+  margin-bottom:14px;
+  font-weight:800;
+}
+
+/* SEARCH BAR */
+.searchbar{
+  position:relative;
+  display:flex;
+  gap:8px;
+  padding:12px;
+  background:rgba(255,255,255,0.05);
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.08);
+}
+.searchbar input{
+  flex:1;
+  background:transparent;
+  border:0;
+  outline:none;
+  color:white;
+  font-size:16px;
+}
+.searchbar button{
+  background:transparent;
+  border:0;
+  color:white;
+  font-size:18px;
+  cursor:pointer;
+}
+
+/* AUTOCOMPLETE */
+.suggestions{
+  position:absolute;
+  top:50px;
+  left:0;
+  right:0;
+  background:#14001f;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.08);
+  display:none;
+  z-index:20;
+}
+.suggestions div{
+  padding:10px;
+  cursor:pointer;
+  color:white;
+  transition:.2s;
+}
+.suggestions div:hover{
+  background:rgba(176,91,255,0.15);
+}
+
+/* FULL BANNER */
+.banner{
+  width:100%;
+  height:330px;
+  border-radius:18px;
+  background:url("adopt.png") center top / cover no-repeat;
+  background-position:center 10%;
+  box-shadow:var(--shadow);
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+/* ACT BANNER */
+.actBanner{
+  width:100%;
+  height:260px;
+  border-radius:18px;
+  background:url("vetbanner.png") center/cover no-repeat;
+  box-shadow:var(--shadow);
+  border:1px solid rgba(255,255,255,0.08);
+  margin-bottom:14px;
+}
+
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:16px;
+}
+
+.card{
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;
+  padding:12px;
+  text-align:center;
+  color:white;
+  cursor:pointer;
+  transition:.25s;
+}
+.card:hover{
+  transform:translateY(-6px);
+  background:linear-gradient(90deg,rgba(176,91,255,0.06),rgba(92,225,255,0.03));
+}
+.card img{
+  width:100%;
+  height:140px;
+  border-radius:12px;
+  object-fit:cover;
+}
+.label{
+  margin-top:8px;
+  font-weight:800;
+  font-size:16px;
+}
+</style>
+</head>
+<body>
+
+<header>Adopt a Friend — Give a Home ❤️</header>
+
+<!-- SEARCH BAR -->
+<div class="section">
+  <div class="searchbar">
+    <input id="searchInput" placeholder="Search pets, breeds, ACT…">
+    <button onclick="runSearch()">🔍</button>
+    <div id="suggestions" class="suggestions"></div>
+  </div>
+</div>
+
+<!-- ANIMAL CARE TRUST SECTION AT TOP -->
+<div class="section">
+  <h2>Animal Care Trust</h2>
+
+  <div class="actBanner"></div>
+
+  <div class="card" style="max-width:380px;margin:auto;">
+    <img src="caretrust.png" style="height:180px;object-fit:cover;border-radius:12px">
+    <div class="label">Animal Care Trust — Mangalore</div>
+    <div class="sub">Rescue • Shelter • Adoption • Treatment</div>
+    <div class="rating" style="color:#ffd56b;">⭐⭐⭐⭐⭐ (4.8)</div>
+
+    <a class="linkbtn" href="https://www.animalcaretrustindia.org/">Visit Website</a>
+    <a class="linkbtn" style="margin-left:6px" href="https://www.google.com/maps/search/animal+care+trust+mangalore">View Map</a>
+  </div>
+</div>
+
+<!-- MAIN BANNER -->
+<div class="section">
+  <div class="banner"></div>
+</div>
+
+<!-- DOGS -->
+<div class="section">
+  <h2>Dogs — Breeds Available</h2>
+  <div class="grid">
+    <div class="card"><img src="2.jpeg"><div class="label">Labrador</div></div>
+    <div class="card"><img src="3.jpeg"><div class="label">German Shepherd</div></div>
+    <div class="card"><img src="gg.jpeg"><div class="label">Golden Retriever</div></div>
+    <div class="card"><img src="4.jpeg"><div class="label">Beagle</div></div>
+    <div class="card"><img src="1.jpeg"><div class="label">Indian Pariah</div></div>
+  </div>
+</div>
+
+<!-- CATS -->
+<div class="section">
+  <h2>Cats — Breeds Available</h2>
+  <div class="grid">
+    <div class="card"><img src="5.jpeg"><div class="label">Persian</div></div>
+    <div class="card"><img src="6.jpeg"><div class="label">Siamese</div></div>
+    <div class="card"><img src="7.jpeg"><div class="label">British Shorthair</div></div>
+    <div class="card"><img src="8.jpeg"><div class="label">Maine Coon</div></div>
+    <div class="card"><img src="9.jpeg"><div class="label">Indie Cat</div></div>
+  </div>
+</div>
+
+<!-- SMALL PETS -->
+<div class="section">
+  <h2>Small Pets — Available</h2>
+  <div class="grid">
+    <div class="card"><img src="10.jpeg"><div class="label">Rabbit</div></div>
+    <div class="card"><img src="11.jpeg"><div class="label">Hamster</div></div>
+    <div class="card"><img src="12.jpeg"><div class="label">Guinea Pig</div></div>
+    <div class="card"><img src="13.jpeg"><div class="label">Parrot</div></div>
+  </div>
+</div>
+
+<script>
+// SEARCH DATA
+const searchData = {
+  "labrador": "pawtential/dog1.jpg",
+  "german shepherd": "pawtential/dog2.jpg",
+  "golden retriever": "pawtential/dog3.jpg",
+  "beagle": "pawtential/dog4.jpg",
+  "indian pariah": "1.jpeg",
+
+  "persian cat": "pawtential/cat1.jpg",
+  "siamese": "pawtential/cat2.jpg",
+  "british shorthair": "pawtential/cat3.jpg",
+  "maine coon": "pawtential/cat4.jpg",
+  "indie cat": "pawtential/cat5.jpg",
+
+  "rabbit": "pawtential/rabbit.jpg",
+  "hamster": "pawtential/hamster.jpg",
+  "guinea pig": "pawtential/guinea.jpg",
+  "parrot": "pawtential/bird.jpg",
+
+  "animal care trust": "https://www.animalcaretrustindia.org/",
+  "act": "https://www.animalcaretrustindia.org/",
+  "shelter": "https://www.animalcaretrustindia.org/"
+};
+
+// AUTOCOMPLETE
+const input = document.getElementById("searchInput");
+const suggBox = document.getElementById("suggestions");
+
+input.addEventListener("input", () => {
+  let q = input.value.toLowerCase();
+  suggBox.innerHTML = "";
+  suggBox.style.display = "none";
+
+  if(q.length === 0) return;
+
+  let matches = Object.keys(searchData).filter(k => k.includes(q));
+
+  if(matches.length){
+    suggBox.style.display = "block";
+    matches.forEach(m => {
+      let div = document.createElement("div");
+      div.textContent = m;
+      div.onclick = () => runSearch(m);
+      suggBox.appendChild(div);
+    });
+  }
+});
+
+// SEARCH FUNCTION
+function runSearch(text){
+  let q = (text || input.value).toLowerCase();
+
+  if(searchData[q]){
+    // If it's a URL → open it
+    if(searchData[q].startsWith("http")){
+      location.href = searchData[q];
+    } else {
+      alert("Breed found: " + q.toUpperCase());
+    }
+  } else {
+    alert("No results found 😿");
+  }
+
+  suggBox.style.display = "none";
+}
+</script>
+
+</body>
+</html>

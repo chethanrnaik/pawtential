@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pawtential — Live Tracker</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+:root{
+  --navy:#081020;
+  --panel:#0e1a34;
+  --ink:#eaf0ff;
+  --muted:#9fb0d3;
+  --brand:#ff8b3d;
+  --ok:#2dd4bf;
+  --danger:#ef4444;
+  --ring:#1b2b52;
+}
+body{
+  margin:0;
+  background:var(--navy);
+  color:var(--ink);
+  font-family:Urbanist,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+}
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 16px;
+  border-bottom:1px solid var(--ring);
+  background:#050814;
+}
+header .title{font-weight:800;font-size:20px}
+header .back{
+  background:var(--brand);
+  color:#2a0d00;
+  border:0;
+  border-radius:10px;
+  padding:10px 12px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.wrap{max-width:1100px;margin:18px auto;padding:0 16px}
+
+/* cards */
+.card{
+  background:var(--panel);
+  border:1px solid var(--ring);
+  border-radius:16px;
+  padding:16px;
+  margin-top:16px;
+}
+
+/* alert banner */
+.alert-box{
+  display:none;
+  border-radius:14px;
+  padding:12px 14px;
+  border:1px solid rgba(239,68,68,0.5);
+  background:linear-gradient(90deg, rgba(239,68,68,0.18), rgba(184,8,62,0.1));
+  box-shadow:0 14px 40px rgba(0,0,0,0.6);
+  margin-bottom:10px;
+}
+.alert-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:6px;
+}
+.alert-title{
+  font-weight:800;
+  color:#fed7d7;
+  font-size:14px;
+}
+.alert-header button{
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.35);
+  color:#fee2e2;
+  border-radius:999px;
+  padding:4px 10px;
+  font-size:12px;
+  cursor:pointer;
+}
+.alert-list{
+  margin:0;
+  padding-left:18px;
+  font-size:13px;
+  color:#fee2e2;
+}
+
+/* status + vitals */
+.status{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  background:#0e1a34;
+  border:1px solid var(--ring);
+  padding:8px 14px;
+  border-radius:50px;
+  font-weight:700;
+}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--danger)}
+.online .dot{background:var(--ok)}
+
+.vitals{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-top:14px;
+}
+.vcard{
+  background:#0f1c37;
+  border:1px solid var(--ring);
+  padding:14px;
+  text-align:center;
+  border-radius:12px;
+}
+.vcard .k{color:var(--muted);font-size:12px}
+.vcard .v{font-size:22px;font-weight:800}
+
+/* map + safe zone */
+#map{
+  width:100%;
+  height:380px;
+  border-radius:14px;
+  margin-top:16px;
+  border:1px solid var(--ring);
+}
+.safe-zone{
+  margin-top:14px;
+  font-size:14px;
+  color:var(--muted);
+}
+.safe-zone label{font-weight:600;color:var(--ink);margin-right:6px;}
+.safe-zone input[type=range]{width:260px;}
+.safe-zone span{font-weight:700;color:#e5f0ff;}
+.note{color:var(--muted);font-size:12px;margin-top:8px}
+
+/* logs table */
+.logs-title{
+  margin-top:6px;
+  font-weight:700;
+  font-size:15px;
+}
+.logs{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:8px;
+  font-size:13px;
+}
+.logs thead{
+  background:#0b1832;
+}
+.logs th,
+.logs td{
+  padding:6px 8px;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.logs th{
+  text-align:left;
+  color:#b9c6eb;
+  font-weight:600;
+}
+.logs tr:nth-child(even) td{
+  background:#0a1328;
+}
+
+/* responsive */
+@media (max-width:640px){
+  .vitals{grid-template-columns:1fr;}
+  #map{height:320px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title">🐾 Pawtential — Live Tracker</div>
+  <button class="back" onclick="history.back()">⬅ Back</button>
+</header>
+
+<div class="wrap">
+
+  <!-- ALERT BANNER -->
+  <div id="alertBox" class="alert-box">
+    <div class="alert-header">
+      <div class="alert-title">⚠ Pet Health / Safety Alert</div>
+      <button id="dismissAlert">Dismiss</button>
+    </div>
+    <ul id="alertList" class="alert-list"></ul>
+  </div>
+
+  <!-- STATUS + VITALS -->
+  <div class="card">
+    <div id="status" class="status"><span class="dot"></span><span id="sTxt">Offline</span></div>
+    <div class="vitals">
+      <div class="vcard">
+        <div class="k">Temperature</div>
+        <div class="v" id="temp">-- °C</div>
+      </div>
+      <div class="vcard">
+        <div class="k">Heart Rate</div>
+        <div class="v" id="hr">-- bpm</div>
+      </div>
+      <div class="vcard">
+        <div class="k">SpO₂</div>
+        <div class="v" id="spo">-- %</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAP + SAFE ZONE + LOGS -->
+  <div class="card">
+    <div id="map"></div>
+
+    <div class="safe-zone">
+      <label for="radiusSlider">Safe zone radius:</label>
+      <input id="radiusSlider" type="range" min="50" max="1000" step="10" value="200">
+      <span id="radiusValue">200</span> m
+      <div style="margin-top:4px;font-size:12px;">
+        Centered at pet's first GPS fix. Leaving this circle will trigger a geofence alert.
+      </div>
+    </div>
+
+    <div class="note">
+      Tip: Ensure your ThingSpeak fields are mapped as:
+      <b>field1=temp</b>, <b>field2=hr</b>, <b>field3=spo₂</b>, <b>field4=lat</b>, <b>field5=lng</b>.
+    </div>
+
+    <div class="logs-title">Recent tracking history</div>
+    <table class="logs">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Temp (°C)</th>
+          <th>HR (bpm)</th>
+          <th>SpO₂ (%)</th>
+          <th>Lat</th>
+          <th>Lng</th>
+        </tr>
+      </thead>
+      <tbody id="logBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<audio id="alertSound" src="alert.mp3" loop preload="auto"></audio>
+
+<script>
+// ===== CONFIG =====
+const params = new URLSearchParams(location.search);
+const CHANNEL = params.get('channel') || 'YOUR_CHANNEL_ID';
+const READKEY = params.get('key') || 'YOUR_READ_KEY';
+
+// ===== MAP =====
+let map = L.map('map').setView([12.9716,77.5946], 14);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
+let marker = L.marker([12.9716,77.5946]).addTo(map);
+
+let pathCoords=[];
+let pathLine=L.polyline([], {color:'#ff8b3d', weight:3}).addTo(map);
+
+let safeRadius=200;
+let safeCenter=null;
+let safeCircle=null;
+
+const radiusSlider=document.getElementById('radiusSlider');
+const radiusValue=document.getElementById('radiusValue');
+radiusSlider.addEventListener('input',()=>{
+  safeRadius=Number(radiusSlider.value);
+  radiusValue.textContent=safeRadius;
+  if(safeCircle) safeCircle.setRadius(safeRadius);
+});
+
+// ALERT BANNER
+const alertBox=document.getElementById('alertBox');
+const alertList=document.getElementById('alertList');
+const alertSound=document.getElementById('alertSound');
+const dismissAlert=document.getElementById('dismissAlert');
+
+let alertActive=false;
+let userDismissed=false;
+dismissAlert.addEventListener('click',()=>{
+  userDismissed=true;
+  alertSound.pause();
+  alertBox.style.display="none";
+});
+
+// ===== FETCH DATA =====
+async function getFeed(){
+  try{
+    const url=`https://api.thingspeak.com/channels/${CHANNEL}/feeds.json?api_key=${READKEY}&results=1`;
+    const r=await fetch(url);
+    const j=await r.json();
+    return j.feeds ? j.feeds[0] : null;
+  }catch(e){return null;}
+}
+
+function setStatus(ts){
+  const t=ts?new Date(ts).getTime():0;
+  const age=Date.now()-t;
+  const box=document.getElementById('status');
+  const txt=document.getElementById('sTxt');
+  if(age<20000){box.classList.add('online');txt.textContent='Online';}
+  else{box.classList.remove('online');txt.textContent='Offline';}
+}
+
+const logBody=document.getElementById('logBody');
+function addLog(time, t, h, s, lat, lng){
+  const tr=document.createElement('tr');
+  tr.innerHTML=`
+    <td>${time}</td>
+    <td>${t}</td>
+    <td>${h}</td>
+    <td>${s}</td>
+    <td>${lat}</td>
+    <td>${lng}</td>`;
+  logBody.insertBefore(tr, logBody.firstChild);
+}
+
+// ===== POLLING LOOP =====
+async function poll(){
+  const f=await getFeed();
+  if(!f) return;
+
+  const now=new Date(f.created_at);
+  const timeStr=now.toLocaleTimeString();
+
+  const temp=f.field1?Number(f.field1):null;
+  const hr=f.field2?Number(f.field2):null;
+  const spo=f.field3?Number(f.field3):null;
+  const lat=f.field4?Number(f.field4):null;
+  const lng=f.field5?Number(f.field5):null;
+
+  setStatus(f.created_at);
+
+  if(temp!=null) document.getElementById('temp').textContent=temp.toFixed(1)+" °C";
+  if(hr!=null)   document.getElementById('hr').textContent=Math.round(hr)+" bpm";
+  if(spo!=null)  document.getElementById('spo').textContent=Math.round(spo)+" %";
+
+  // MAP + GEOFENCE
+  let outside=false;
+  if(lat!=null && lng!=null){
+    const pos=[lat,lng];
+    marker.setLatLng(pos);
+
+    pathCoords.push(pos);
+    if(pathCoords.length>200) pathCoords.shift();
+    pathLine.setLatLngs(pathCoords);
+
+    if(!safeCenter){
+      safeCenter=pos;
+      safeCircle=L.circle(safeCenter,{
+        radius:safeRadius,
+        color:'#b05bff',
+        fillColor:'#b05bff',
+        fillOpacity:0.08,
+        weight:1.5
+      }).addTo(map);
+      map.setView(pos,16);
+    } else {
+      safeCircle.setRadius(safeRadius);
+      const dist=map.distance(safeCenter,pos);
+      outside = dist > safeRadius;
+    }
+
+    map.panTo(pos,{animate:true});
+  }
+
+  // LOG ROW
+  addLog(timeStr,
+    temp!=null?temp.toFixed(1):"--",
+    hr!=null?Math.round(hr):"--",
+    spo!=null?Math.round(spo):"--",
+    lat!=null?lat.toFixed(5):"--",
+    lng!=null?lng.toFixed(5):"--"
+  );
+
+  // ===== ALERTS (SpO₂ REMOVED) =====
+  const alerts=[];
+
+  if(temp!=null && temp>40){
+    alerts.push(`High temperature: ${temp.toFixed(1)} °C (above 40 °C).`);
+  }
+  if(hr!=null){
+    if(hr<50) alerts.push(`Low heart rate: ${Math.round(hr)} bpm (below 50 bpm).`);
+    if(hr>160) alerts.push(`High heart rate: ${Math.round(hr)} bpm (above 160 bpm).`);
+  }
+  // ❌ REMOVED — NO SpO₂ ALERTS
+
+  if(outside){
+    alerts.push(`Pet is outside the safe zone (${safeRadius} m).`);
+  }
+
+  if(alerts.length){
+    alertList.innerHTML=alerts.map(a=>`<li>${a}</li>`).join('');
+    alertBox.style.display="block";
+    if(!alertActive && !userDismissed){
+      alertActive=true;
+      alertSound.currentTime=0;
+      alertSound.play().catch(()=>{});
+    }
+  } else {
+    alertBox.style.display="none";
+    alertList.innerHTML="";
+    alertActive=false;
+    userDismissed=false;
+    alertSound.pause();
+  }
+}
+
+poll();
+setInterval(poll,5000);
+</script>
+
+</body>
+</html>

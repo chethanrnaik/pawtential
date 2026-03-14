@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Vet Consultation — Pawtential</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root{
+  --ink:#ffffff;
+  --muted:#d6c9ff;
+  --neon:#b05bff;
+  --neon-2:#8a3bff;
+  --glass: rgba(255,255,255,0.04);
+  --shadow: 0 20px 60px rgba(16,6,28,0.7);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:Urbanist,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+  color:var(--ink);
+  background:#050009 url("/mnt/data/stock-vector-dark-abstract-welcome-page-with-purple-blue-waves-2633393175.jpg") center/cover fixed;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* glossy overlay */
+body::after{
+  content:"";
+  position:fixed; inset:0; pointer-events:none;
+  background: linear-gradient(120deg, rgba(176,91,255,0.06), rgba(138,59,255,0.03));
+  mix-blend-mode: overlay; opacity:0.36;
+  animation:glossShift 10s linear infinite;
+}
+@keyframes glossShift{0%{transform:translateX(-40%) rotate(6deg);}50%{transform:translateX(40%) rotate(6deg);}100%{transform:translateX(-40%) rotate(6deg);}}
+
+/* header */
+.header{ position:sticky; top:0; z-index:1200; background: linear-gradient(180deg, rgba(6,6,10,0.8), rgba(6,6,10,0.45)); border-bottom:1px solid rgba(255,255,255,0.03); backdrop-filter: blur(6px); }
+.nav{ max-width:1200px; margin:0 auto; padding:10px 16px; display:flex; gap:12px; align-items:center; }
+.brand{ display:flex; gap:12px; align-items:center; cursor:pointer }
+.brand img{ width:44px; height:44px; border-radius:10px; object-fit:cover; box-shadow:0 8px 28px rgba(0,0,0,0.6) }
+.brand .name{ font-weight:800; font-size:18px; color:var(--ink) }
+
+/* container */
+.container{ max-width:1200px; margin:22px auto; padding:0 16px; position:relative; z-index:1; }
+
+/* search */
+.searchbar{
+  display:flex; gap:8px; align-items:center;
+  background: rgba(255,255,255,0.03); border-radius:12px; padding:8px; border:1px solid rgba(255,255,255,0.04);
+}
+.search-input{ flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px; padding:8px 10px; }
+.search-btn{ background:linear-gradient(90deg,var(--neon),var(--neon-2)); border:0; color:#041017; padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:800; }
+.suggestions{ position:relative; }
+.suggestions-list{
+  position:absolute; left:0; right:0; top:calc(100% + 8px); background: rgba(3,2,8,0.98); border-radius:12px; border:1px solid rgba(255,255,255,0.04);
+  box-shadow: 0 18px 60px rgba(2,0,24,0.75); max-height:320px; overflow:auto; z-index:1400;
+}
+.suggestion{
+  padding:10px 12px; cursor:pointer; display:flex; gap:10px; align-items:center; color:var(--ink);
+}
+.suggestion:hover, .suggestion.active{ background: linear-gradient(90deg, rgba(176,91,255,0.06), rgba(138,59,255,0.03)); transform: translateX(6px); }
+.suggestion .type{ font-size:12px; color:var(--muted); background: rgba(255,255,255,0.02); padding:6px 8px; border-radius:8px; }
+
+/* layout sections */
+.section{ margin-top:22px; }
+.h2{ font-size:24px; font-weight:800; margin-bottom:12px; color:var(--ink); }
+
+/* banner */
+.banner{ width:100%; height:260px; border-radius:14px; overflow:hidden; border:1px solid rgba(255,255,255,0.06); box-shadow:var(--shadow); background:#0a0a0f center/cover no-repeat; display:flex; align-items:flex-end; }
+.banner .cta{ padding:18px; background: linear-gradient(180deg, rgba(0,0,0,0.0), rgba(0,0,0,0.45)); width:100%; display:flex; justify-content:space-between; align-items:center; }
+.banner .cta .left{ display:flex; gap:12px; align-items:center; }
+.banner .cta h3{ margin:0; font-size:20px; font-weight:800; }
+.banner .cta .btn{ background:linear-gradient(90deg,var(--neon),var(--neon-2)); color:#041017; padding:10px 14px; border-radius:10px; font-weight:800; text-decoration:none; }
+
+/* grid cards */
+.grid{ display:grid; grid-template-columns: repeat(auto-fill,minmax(260px,1fr)); gap:18px; }
+.card{ background: rgba(255,255,255,0.03); border-radius:12px; padding:12px; border:1px solid rgba(255,255,255,0.04); box-shadow:var(--shadow); transition:transform .18s; }
+.card:hover{ transform:translateY(-6px); background: linear-gradient(90deg, rgba(176,91,255,0.04), rgba(92,225,255,0.02)); }
+.card img{ width:100%; height:150px; object-fit:cover; border-radius:10px; }
+.label{ font-weight:800; margin-top:10px; font-size:18px; color:var(--ink); }
+.sub{ font-size:13px; color:var(--muted); margin-top:6px; }
+.rating{ margin-top:8px; color:#ffd56b; }
+
+/* animal care trust card */
+.act-card{ display:flex; gap:12px; align-items:center; padding:12px; }
+.act-card img{ width:220px; height:140px; object-fit:cover; border-radius:12px; }
+
+/* footer note */
+.note{ margin-top:10px; color:var(--muted); font-size:13px; }
+
+/* responsive */
+@media (max-width:900px){
+  .banner{ height:200px; }
+  .grid{ grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); }
+}
+@media (max-width:640px){
+  .nav{ padding:8px 12px; }
+  .banner{ height:180px; }
+  .act-card{ flex-direction:column; align-items:flex-start; }
+}
+</style>
+</head>
+<body>
+
+<!-- header / nav -->
+<header class="header" role="banner">
+  <div class="nav">
+    <div class="brand" onclick="location.href='index.html'">
+      <img src="logo.jpeg" alt="Pawtential logo">
+      <div class="name">Pawtential</div>
+    </div>
+    <div style="flex:1"></div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="search-btn" onclick="location.href='tracker.html'">📍 Tracker</button>
+      <button class="search-btn" onclick="location.href='pet-adoption.html'">🏠 Adopt</button>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- search -->
+  <div class="section">
+    <div class="searchbar" role="search" aria-label="Search vets and topics">
+      <div style="flex:1; position:relative;" class="suggestions">
+        <input id="searchInput" class="search-input" placeholder="Search vets, clinics, symptoms (e.g. 'Yashaswi', 'tick removal', 'grooming')">
+        <div id="suggestions" class="suggestions-list" style="display:none" role="listbox" aria-label="Search suggestions"></div>
+      </div>
+      <button class="search-btn" id="searchBtn">Search</button>
+    </div>
+    <div class="note">Suggestions include vets, clinics, Animal Care Trust, and self-care topics. Use arrow keys ↑↓ and Enter to choose.</div>
+  </div>
+
+  <!-- banner -->
+  <div class="section">
+    <div class="banner" style="background-image:url('vetbanner.png');">
+      <div class="cta">
+        <div class="left">
+          <div>
+            <h3>Animal Care Trust — Rescue, Shelter & Treatment</h3>
+            <div class="sub">Trusted rescue & rehabilitation in Mangalore</div>
+          </div>
+        </div>
+        <div>
+          <a class="btn" href="https://www.animalcaretrustindia.org/" target="_blank" rel="noopener">Visit ACT</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- nearby vets -->
+  <div class="section">
+    <div class="h2">Nearby Vets & Clinics</div>
+
+    <div class="grid" id="vetsGrid">
+      <div class="card vet-card" data-name="dr yashaswi naravi" data-link="https://www.google.com/maps/dir//Little+Paws+Veterinary+Clinic+-+Dr.+Yashaswi+Naravi">
+        <img src="vet1.png" alt="Dr Yashaswi">
+        <div class="label">Dr. Yashaswi Naravi</div>
+        <div class="sub">Little Paws Veterinary Clinic — 1.1 km away</div>
+        <div class="rating">⭐⭐⭐⭐☆ (4.4)</div>
+        <div style="margin-top:10px;"><a class="search-btn" href="https://www.google.com/maps/dir//Little+Paws+Veterinary+Clinic+-+Dr.+Yashaswi+Naravi" target="_blank">View Location</a></div>
+      </div>
+
+      <div class="card vet-card" data-name="dr prithvi" data-link="https://www.google.com/maps/dir/12.863016,74.8697784/Eela+The+Vet">
+        <img src="vet2.png" alt="Dr Prithvi">
+        <div class="label">Dr. Prithvi</div>
+        <div class="sub">Eela The Vet — 2.9 km away</div>
+        <div class="rating">⭐⭐⭐⭐⭐ (4.9)</div>
+        <div style="margin-top:10px;"><a class="search-btn" href="https://www.google.com/maps/dir/12.863016,74.8697784/Eela+The+Vet" target="_blank">View Location</a></div>
+      </div>
+
+      <div class="card vet-card" data-name="dr gk bhat" data-link="https://www.google.com/maps/dir//Government+Veterinary+Polyclinic">
+        <img src="vet3.png" alt="Dr GK Bhat">
+        <div class="label">Dr. G.K. Bhat</div>
+        <div class="sub">Government Veterinary Polyclinic — 1.8 km away</div>
+        <div class="rating">⭐⭐⭐⭐☆ (4.2)</div>
+        <div style="margin-top:10px;"><a class="search-btn" href="https://www.google.com/maps/dir//Government+Veterinary+Polyclinic" target="_blank">View Location</a></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Animal Care Trust card -->
+  <div class="section">
+    <div class="h2">Animal Care Trust — Mangalore</div>
+    <div class="card act-card">
+      <img src="caretrust.png" alt="Animal Care Trust">
+      <div style="flex:1">
+        <div class="label">Animal Care Trust</div>
+        <div class="sub">Rescue • Shelter • Adoption • Treatment</div>
+        <div class="rating">⭐⭐⭐⭐⭐ (4.8)</div>
+        <div style="margin-top:12px;display:flex;gap:10px">
+          <a class="search-btn" href="https://www.animalcaretrustindia.org/" target="_blank">Visit Website</a>
+          <a class="search-btn" href="https://www.google.com/maps/dir//VVXG%2BVX9+Water+tank,+Raja+Rajeshwari+Temple+Rd" target="_blank">View on Map</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Online consultations -->
+  <div class="section">
+    <div class="h2">Online Pet Consultation</div>
+    <div class="grid">
+      <div class="card">
+        <img src="24pet.png" alt="24/7">
+        <div class="label">24/7 Live Vet Video Call</div>
+        <div class="sub">Instant expert help for emergencies</div>
+        <div style="margin-top:10px"><a class="search-btn" href="https://www.myfurries.com/" target="_blank">Start Now</a></div>
+      </div>
+      <div class="card">
+        <img src="chat.png" alt="Chat">
+        <div class="label">Chat With Certified Vets</div>
+        <div class="sub">Send symptoms, photos & get treatment</div>
+        <div style="margin-top:10px"><a class="search-btn" href="https://www.chewy.com/b/connect-vet-16616" target="_blank">Chat Now</a></div>
+      </div>
+      <div class="card">
+        <img src="nution and diet.jpeg" alt="Nutrition">
+        <div class="label">Nutrition & Diet Plans</div>
+        <div class="sub">Custom meal guides for dogs & cats</div>
+        <div style="margin-top:10px"><a class="search-btn" href="https://www.pets4.com/blog/nutritional-needs-for-pets-building-a-healthy-diet-plan" target="_blank">Get Plan</a></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Self-care -->
+  <div class="section">
+    <div class="h2">Self-Care Tips for Pet Owners</div>
+    <div class="grid" id="careGrid">
+      <div class="card">
+        <img src="grooming bsasics.jpg" alt="Grooming">
+        <div class="label">Grooming Basics</div>
+        <div class="sub">Brushing, bathing & coat care made easy</div>
+        <div style="margin-top:10px"><a class="search-btn" href="https://www.youtube.com/watch?v=Ni1yyrD2Bi0" target="_blank">Watch Guide</a></div>
+      </div>
+
+      <div class="card">
+        <img src="first aid.jpeg" alt="First Aid">
+        <div class="label">First-Aid for Pets</div>
+        <div class="sub">Quick steps for cuts, fever, ticks & more</div>
+        <div style="margin-top:10px"><a class="search-btn" href="https://www.youtube.com/watch?v=Yxtbvo2rFEA" target="_blank">Learn More</a></div>
+      </div>
+
+      <div class="card">
+        <img src="vaccinatin.png" alt="Vaccination">
+        <div class="label">Vaccination Guide</div>
+        <div class="sub">Keep your pet protected & healthy</div>
+        <div style="margin-top:10px"><a class="search-btn" href="https://www.petmd.com/dog/care/dog-vaccinations-for-every-lifestage" target="_blank">See Schedule</a></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="note">If a search doesn't match any result, an inline message appears and you can try different terms (e.g. partial names or topics like "tick", "grooming", "animal care trust").</div>
+  </div>
+</div>
+
+<script>
+/* ======= Search suggestion / redirect logic ======= */
+
+/*
+  The 'items' array maps searchable text to objects with:
+  - title: displayed label
+  - type: 'Vet' | 'Topic' | 'Trust' | 'Article'
+  - url: destination (maps, website, youtube, article)
+  - thumb: optional image (local path)
+*/
+const items = [
+  // Vets
+  { title: 'Dr. Yashaswi Naravi',    type:'Vet',   key:'yashaswi naravi',  url:'https://www.google.com/maps/dir//Little+Paws+Veterinary+Clinic+-+Dr.+Yashaswi+Naravi', thumb:'vet1.png' },
+  { title: 'Dr. Prithvi (Eela The Vet)', type:'Vet',key:'prithvi eela',     url:'https://www.google.com/maps/dir/12.863016,74.8697784/Eela+The+Vet', thumb:'vet2.png' },
+  { title: 'Dr. G.K. Bhat',         type:'Vet',   key:'gk bhat',           url:'https://www.google.com/maps/dir//Government+Veterinary+Polyclinic', thumb:'vet3.png' },
+
+  // Animal Care Trust
+  { title: 'Animal Care Trust — ACT', type:'Trust', key:'animal care trust', url:'https://www.animalcaretrustindia.org/', thumb:'caretrust.png' },
+
+  // Self-care & topics (symptoms / guides)
+  { title:'Grooming Basics (Video)', type:'Topic', key:'grooming', url:'https://www.youtube.com/watch?v=Ni1yyrD2Bi0'},
+  { title:'Tick Removal (Video)',    type:'Topic', key:'tick removal', url:'https://www.youtube.com/watch?v=OZ8cHthlLZk'},
+  { title:'Fever — Vet guide',       type:'Topic', key:'fever', url:'https://www.youtube.com/watch?v=HcBheAQ7EzA'},
+  { title:'Vomiting — PetMD',        type:'Topic', key:'vomiting', url:'https://www.petmd.com/dog/symptoms/why-dog-throwing'},
+  { title:'Vaccination — AKC',       type:'Topic', key:'vaccination', url:'https://www.akc.org/expert-advice/health/pet-vaccinations/'},
+  { title:'Skin infection — PetMD',   type:'Topic', key:'skin infection', url:'https://www.petmd.com/dog/conditions/skin/dog-skin-infection'},
+  { title:'Ear mites (Video)',       type:'Topic', key:'ear mites', url:'https://www.youtube.com/watch?v=RnXjvjJPDcU'},
+  { title:'Diarrhea — PetMD',        type:'Topic', key:'diarrhea', url:'https://www.petmd.com/dog/symptoms/why-dog-has-diarrhea'},
+  { title:'Eye redness — VCA',       type:'Topic', key:'eye redness', url:'https://vcahospitals.com/know-your-pet/conjunctivitis-in-dogs'},
+  { title:'Injury — First Aid (ASPCA)', type:'Topic', key:'injury', url:'https://www.aspca.org/pet-care/general-pet-care/basic-first-aid'}
+];
+
+/* DOM refs */
+const input = document.getElementById('searchInput');
+const suggestionsEl = document.getElementById('suggestions');
+const searchBtn = document.getElementById('searchBtn');
+
+/* helper: normalize */
+function clean(s){ return (s||'').toString().trim().toLowerCase(); }
+
+/* build suggestions when typing */
+let activeIndex = -1;
+input.addEventListener('input', () => {
+  const q = clean(input.value);
+  activeIndex = -1;
+  if(!q){
+    suggestionsEl.style.display = 'none';
+    suggestionsEl.innerHTML = '';
+    return;
+  }
+
+  // find matches by checking title & key contains q
+  const matches = items.filter(it => (clean(it.title).includes(q) || (it.key && it.key.includes(q)) || it.type.toLowerCase().includes(q))).slice(0,12);
+
+  if(matches.length === 0){
+    suggestionsEl.style.display = 'block';
+    suggestionsEl.innerHTML = `<div class="suggestion" role="option"><div style="font-weight:700">No results found</div><div style="font-size:13px;color:${getComputedStyle(document.documentElement).getPropertyValue('--muted')||'#bdbdbd'}">Try partial names like "yash" or topics like "tick"</div></div>`;
+    return;
+  }
+
+  suggestionsEl.innerHTML = matches.map((m, i) => {
+    const thumb = m.thumb ? `<img src="${m.thumb}" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:8px">` : `<div style="width:48px;height:48px;border-radius:8px;background:rgba(255,255,255,0.02);display:grid;place-items:center">${m.type[0]}</div>`;
+    return `<div class="suggestion" role="option" data-idx="${i}" data-url="${m.url}" tabindex="-1">
+              <div style="display:flex;gap:10px;align-items:center">
+                ${thumb}
+                <div>
+                  <div style="font-weight:800">${m.title}</div>
+                  <div style="font-size:12px;color:var(--muted)">${m.type}</div>
+                </div>
+              </div>
+            </div>`;
+  }).join('');
+  suggestionsEl.style.display = 'block';
+
+  // attach click handlers to suggestions
+  Array.from(suggestionsEl.querySelectorAll('.suggestion')).forEach(el => {
+    el.onclick = () => {
+      const url = el.dataset.url;
+      if(url) window.open(url, '_blank');
+      else alert('No URL for this result.');
+    }
+  });
+});
+
+/* keyboard navigation */
+input.addEventListener('keydown', (ev) => {
+  const list = Array.from(suggestionsEl.querySelectorAll('.suggestion'));
+  if(suggestionsEl.style.display === 'none' || list.length===0) return;
+
+  if(ev.key === 'ArrowDown'){
+    ev.preventDefault();
+    activeIndex = Math.min(activeIndex+1, list.length-1);
+    updateActive(list);
+  } else if(ev.key === 'ArrowUp'){
+    ev.preventDefault();
+    activeIndex = Math.max(activeIndex-1, 0);
+    updateActive(list);
+  } else if(ev.key === 'Enter'){
+    ev.preventDefault();
+    if(activeIndex >=0 && list[activeIndex]){
+      list[activeIndex].click();
+    } else {
+      // fallback to search button action below
+      execSearch(input.value);
+    }
+  } else if(ev.key === 'Escape'){
+    suggestionsEl.style.display = 'none';
+  }
+});
+function updateActive(list){
+  list.forEach((el, idx) => el.classList.toggle('active', idx===activeIndex));
+  if(activeIndex>=0 && list[activeIndex]){
+    list[activeIndex].scrollIntoView({block:'nearest',behavior:'smooth'});
+  }
+}
+
+/* search button (or Enter fallback) will try to find best match and redirect or alert if none */
+searchBtn.addEventListener('click', ()=> execSearch(input.value));
+function execSearch(q){
+  const qn = clean(q);
+  if(!qn){ alert('Type a vet name, clinic or symptom to search.'); return; }
+
+  // find exact or partial match in items
+  let best = items.find(it => clean(it.title) === qn || (it.key && it.key === qn));
+  if(!best){
+    best = items.find(it => clean(it.title).includes(qn) || (it.key && it.key.includes(qn)));
+  }
+  if(best && best.url){
+    window.open(best.url, '_blank');
+    return;
+  }
+
+  // try to match vet cards by data-name (cards on page)
+  const vetCards = Array.from(document.querySelectorAll('.vet-card'));
+  const cardMatch = vetCards.find(c => c.dataset.name && c.dataset.name.includes(qn));
+  if(cardMatch){
+    const url = cardMatch.dataset.link;
+    if(url) window.open(url, '_blank');
+    return;
+  }
+
+  // fallback: no results
+  alert('No results found. Try partial names (e.g. "yash" / "prithvi") or topics like "grooming", "tick".');
+}
+
+/* hide suggestions when clicking outside */
+document.addEventListener('click', (e) => {
+  if(!e.target.closest('.suggestions') && !e.target.closest('.search-input')){
+    suggestionsEl.style.display = 'none';
+  }
+});
+
+/* small enhancement: clicking vet card opens link in new tab too */
+document.querySelectorAll('.vet-card').forEach(card=>{
+  card.style.cursor='pointer';
+  card.addEventListener('click', (e)=>{
+    // avoid if clicked an inner link button
+    if(e.target.closest('a')) return;
+    const link = card.dataset.link;
+    if(link) window.open(link,'_blank');
+  });
+});
+</script>
+
+</body>
+</html>

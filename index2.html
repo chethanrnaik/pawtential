@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Pawtential — Pet Care • Tracking</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;700;800&display=swap" rel="stylesheet">
+<!-- Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root{
+  --teal-900:#022f33; --ink:#ffffff; --muted:#b9dbe0; --brand:#12c6b6; --ok:#2dd4bf; --danger:#f87171;
+  --ring: rgba(255,255,255,0.08); --shadow: 0 14px 40px rgba(2,20,22,0.6);
+  --glass: rgba(255,255,255,0.04);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:Urbanist,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+  color:var(--ink);
+  background:var(--teal-900);
+  background-image:url("/mnt/data/bg-texture.jpeg");
+  background-size:cover;
+  background-position:center;
+  background-attachment:fixed;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* glossy sheen */
+body::after{
+  content:"";
+  position:fixed; inset:0; pointer-events:none;
+  background: linear-gradient(120deg, rgba(255,255,255,0.03), rgba(255,255,255,0.09), rgba(255,255,255,0.02));
+  mix-blend-mode: overlay;
+  opacity:0.42;
+  animation:glossShift 8s linear infinite;
+  filter: hue-rotate(170deg) saturate(1.05);
+}
+@keyframes glossShift{
+  0%{ transform:translateX(-45%) rotate(8deg); }
+  50%{ transform:translateX(45%) rotate(8deg); }
+  100%{ transform:translateX(-45%) rotate(8deg); }
+}
+
+/* layout */
+.header{ position:sticky; top:0; z-index:1200; background:linear-gradient(180deg, rgba(2,20,21,0.70), rgba(2,20,21,0.45)); backdrop-filter:blur(8px); border-bottom:1px solid var(--ring); }
+.nav{ max-width:1200px; margin:0 auto; padding:10px 16px; display:flex; gap:12px; align-items:center; }
+.brand{ display:flex; gap:12px; align-items:center; cursor:pointer }
+.brand img{ width:48px; height:48px; border-radius:12px; object-fit:cover; box-shadow:0 8px 30px rgba(0,0,0,0.6) }
+.brand .name{ font-weight:800; font-size:20px; color:var(--ink) }
+
+.iconbtn{ background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); color:var(--ink); padding:8px 12px; border-radius:12px; cursor:pointer; }
+.iconbtn:hover{ transform:translateY(-2px); transition:.14s }
+
+.search{ flex:1; display:flex; gap:8px; align-items:center }
+.searchbar{ flex:1; display:flex; gap:6px; align-items:center; background: rgba(255,255,255,0.04); border-radius:12px; padding:6px; border:1px solid rgba(255,255,255,0.06) }
+.searchbar input{ flex:1; background:transparent; border:0; outline:none; color:var(--ink); padding:8px 10px; font-size:15px }
+.searchbar button{ background:transparent; border:0; color:var(--ink); padding:8px 10px; cursor:pointer }
+.badge{ background: linear-gradient(90deg, rgba(18,198,182,0.06), rgba(18,198,182,0.03)); color:var(--ink); border-radius:10px; padding:8px 12px; border:1px solid rgba(255,255,255,0.04) }
+
+/* drawer */
+.drawer{ position:fixed; inset:0; pointer-events:none; z-index:1300 }
+.drawer .shade{ position:absolute; inset:0; background:rgba(0,0,0,0.55); opacity:0; transition:opacity .25s }
+.drawer .panel{ position:absolute; top:0; left:0; width:320px; height:100%; background: linear-gradient(180deg, rgba(2,40,42,0.95), rgba(1,28,30,0.95)); transform: translateX(-110%); transition: transform .25s; padding:18px; color:#fff; border-right:1px solid rgba(255,255,255,0.04); box-shadow:var(--shadow); pointer-events:auto; overflow:auto; }
+.drawer.open{ pointer-events:auto }
+.drawer.open .shade{ opacity:1 }
+.drawer.open .panel{ transform:translateX(0) }
+
+.menu-head{ display:flex; gap:12px; align-items:center; margin-bottom:8px }
+.menu-head img{ width:48px; height:48px; border-radius:10px; object-fit:cover; border:2px solid rgba(255,255,255,0.04) }
+.menu-title{ font-weight:800; font-size:18px }
+.menu-sub{ color:var(--muted); font-size:13px; margin-top:2px }
+.menu a{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; color:var(--ink); background: rgba(255,255,255,0.02); margin-top:8px; text-decoration:none; border:1px solid rgba(255,255,255,0.02) }
+.menu a:hover{ background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)); transform:translateX(6px) }
+
+/* main */
+.main{ max-width:1200px; margin:22px auto; padding:0 16px; position:relative; z-index:1 }
+
+/* loader */
+#loader{ position:fixed; inset:0; display:grid; place-items:center; background: rgba(0,0,0,0.55); z-index:2000; }
+.loader-inner{ text-align:center; color:var(--ink) }
+.loader-logo{ width:min(480px,74vw); max-width:520px; display:block; margin:0 auto 10px; border-radius:12px; box-shadow:0 8px 28px rgba(0,0,0,0.6) }
+.runner-gif{ display:block; width:120px; height:86px; margin:8px auto 0 }
+
+/* hero */
+.hero{ display:grid; gap:14px; }
+.videobox{ position:relative; border-radius:14px; overflow:hidden; border:1px solid rgba(255,255,255,0.06); box-shadow:var(--shadow); background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02)); }
+.videobox video{ width:100%; height:auto; max-height:56vh; object-fit:cover; display:block; }
+.slogan{ position:absolute; left:18px; top:18px; color:var(--ink); text-shadow:0 6px 18px rgba(0,0,0,0.6); background: linear-gradient(90deg, rgba(2,40,42,0.48), rgba(2,40,42,0.25)); padding:12px 16px; border-radius:8px; font-weight:700; }
+.slogan .big{ font-size:26px; color:#fff }
+.slogan .small{ font-size:16px; color:#f6f9ff; opacity:0.95 }
+
+/* monitor card */
+.monitor{ margin-top:16px; border-radius:16px; padding:16px; display:grid; grid-template-columns:220px 1fr; gap:16px; box-shadow:var(--shadow); background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03) }
+.photo{ width:100%; height:200px; object-fit:cover; border-radius:12px; border:1px solid rgba(255,255,255,0.03) }
+.m-name{ font-weight:800; font-size:22px; color:var(--ink) }
+.m-owner{ color:var(--muted); font-size:13px; margin-top:6px }
+.status{ display:inline-flex; align-items:center; gap:8px; background: rgba(255,255,255,0.02); padding:8px 10px; border-radius:999px; border:1px solid rgba(255,255,255,0.03) }
+.status .dot{ width:10px; height:10px; border-radius:50%; background:var(--danger) }
+.status.online .dot{ background:var(--ok) }
+.vitals{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:10px }
+.vcard{ background: rgba(255,255,255,0.02); padding:12px; border-radius:10px; text-align:center; border:1px solid rgba(255,255,255,0.02) }
+.vcard .k{ color:var(--muted); font-size:12px }
+.vcard .v{ font-weight:800; font-size:18px }
+
+/* actions and sections */
+.actions{ display:flex; gap:10px; align-items:center; margin-top:8px }
+.btn{ border:0; border-radius:12px; padding:10px 14px; cursor:pointer; font-weight:800 }
+.btn.primary{ background: linear-gradient(90deg,var(--brand), rgba(18,198,182,0.75)); color:#01241f; box-shadow: 0 8px 24px rgba(18,198,182,0.06) }
+.btn.ghost{ background: transparent; border:1px solid rgba(255,255,255,0.04); color:var(--ink) }
+
+.section{ margin-top:22px }
+.section h2{ margin:0 0 12px; font-size:28px; color:var(--ink) }
+.grid-cats{ display:grid; grid-template-columns: repeat(8, 1fr); gap:12px }
+.cat{ background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius:16px; padding:12px; text-align:center; cursor:pointer; color:white; text-decoration:none; transition:0.25s; }
+.cat:hover{ transform: translateY(-6px); background: rgba(255,255,255,0.14); }
+.cat img{ width:100%; height:110px; object-fit:cover; border-radius:12px }
+.cat .label{ margin-top:8px; font-weight:800; color:white }
+.grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px }
+.card{ background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius:16px; padding:12px; text-align:center; color:var(--ink); text-decoration:none; transition:0.2s }
+.card:hover{ transform:translateY(-6px) }
+.card img.thumb{ width:100%; height:160px; object-fit:cover; border-radius:12px }
+
+/* Blog & posts */
+.blogs{ display:grid; grid-template-columns:2fr 1fr; gap:14px }
+.post{ background:#0e2a2d; border-radius:12px; padding:10px; display:flex; gap:10px; align-items:center; margin-bottom:8px; color:var(--ink) }
+.post img{ width:90px; height:70px; object-fit:cover; border-radius:8px }
+
+/* footer */
+footer{ margin:28px 0 46px; padding:16px; text-align:center; color:var(--muted) }
+.socials{ display:flex; gap:14px; justify-content:center; align-items:center; margin-top:10px }
+.socials a{ color:var(--ink); text-decoration:none; display:inline-flex; align-items:center; gap:8px }
+
+/* icons */
+.icon-circle{ width:40px; height:40px; display:inline-grid; place-items:center; border-radius:8px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.06) }
+.icon-circle:hover{ transform:translateY(-4px); }
+
+/* reveal */
+.reveal{ opacity:0; transform:translateY(14px); transition:opacity .6s,transform .6s }
+.reveal.in{ opacity:1; transform:translateY(0) }
+
+/* responsive */
+@media (max-width:1020px){ .grid-cats{ grid-template-columns: repeat(4,1fr) } .monitor{ grid-template-columns: 1fr } .photo{ height:180px } .blogs{ grid-template-columns:1fr } }
+@media (max-width:640px){ .grid-cats{ grid-template-columns: repeat(2,1fr) } .brand .name{ display:none } .grid-3{ grid-template-columns:1fr } .videobox video{ max-height:36vh } }
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader" role="status" aria-live="polite">
+  <div class="loader-inner">
+    <img class="loader-logo" src="logo.jpeg" alt="Pawtential logo (loader)">
+    <img class="runner-gif" src="Running Kitty ! Meow.gif" alt="Running cat">
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="header" role="banner">
+  <div class="nav">
+    <button class="iconbtn" id="openDrawer" aria-label="Open menu">☰</button>
+
+    <div class="brand" role="link" onclick="location.href='index.html'">
+      <img src="logo.jpeg" alt="Pawtential logo">
+      <div class="name">Pawtential</div>
+    </div>
+
+    <div class="search" role="search">
+      <div class="searchbar">
+        <input id="q" placeholder="Search for food, toys, vets…" aria-label="Search">
+        <button onclick="location.href='search.html?q='+encodeURIComponent(document.getElementById('q').value)" aria-label="Search">🔍</button>
+      </div>
+      <button class="badge" onclick="location.href='delivery.html'">📍 Detect location</button>
+    </div>
+
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="iconbtn" onclick="location.href='orders.html'">🚚</button>
+      <button class="iconbtn" onclick="location.href='support.html'">📞</button>
+      <button class="iconbtn" onclick="location.href='account.html'">👤</button>
+      <button class="iconbtn" onclick="location.href='cart.html'">🛒</button>
+    </div>
+  </div>
+</header>
+
+<!-- DRAWER -->
+<div class="drawer" id="drawer" aria-hidden="true">
+  <div class="shade" id="shade"></div>
+  <aside class="panel" role="dialog" aria-modal="true">
+    <div class="menu-head">
+      <!-- use a default pet thumbnail (user can change via profile) -->
+      <img id="menuPetThumb" src="/mnt/data/bella.jpeg" alt="pet thumbnail">
+      <div>
+        <div class="menu-title" id="pNameMenu">Bella</div>
+        <div class="menu-sub" id="pOwnerMenu">Owner: Prajwal Naik</div>
+      </div>
+    </div>
+
+    <nav class="menu" aria-label="Main menu">
+      <a href="pawprints.html">🐾 Paw Prints (tracking &amp; health)</a>
+      <a href="dogs.html">🐶 Dogs</a>
+      <a href="cats.html">🐱 Cats</a>
+      <a href="small-animals.html">🐹 Small animals</a>
+      <a href="pharmacy.html">💊 Pharmacy</a>
+      <a href="vet-consultation.html">🩺 Vet consultation</a>
+      <a href="pet-adoption.html">🏠 Pet adoption</a>
+      <a href="customer-care.html">🎧 Customer care</a>
+    </nav>
+  </aside>
+</div>
+
+<main class="main" role="main">
+  <!-- HERO -->
+  <section class="hero reveal" data-ani>
+    <div class="videobox" role="region" aria-label="Featured">
+      <video src="hero.mp4" autoplay muted loop playsinline></video>
+      <div class="slogan">
+        <span class="big">Pawsitively</span>
+        <span class="small">the best care</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PET PROFILE / MONITORING -->
+  <section class="monitor reveal" data-ani>
+    <img id="petPhoto" class="photo" src="bella.jpeg" alt="Pet photo">
+
+    <div>
+      <div class="m-name" id="petNameDisp">Bella</div>
+      <div class="m-owner" id="ownerLineDisp">Owner: Prajwal Naik • Age: 8 years • Breed: Golden Labrador • Color: Fawn • Device: collar-001</div>
+
+      <div style="margin-top:12px">
+        <div id="statusEl" class="status"><span class="dot"></span><span id="statusText" style="font-weight:700;margin-left:6px">Offline</span></div>
+      </div>
+
+      <div class="vitals">
+        <div class="vcard"><div class="k">Temperature</div><div class="v" id="tempVal">-- °C</div></div>
+        <div class="vcard"><div class="k">Heart Rate</div><div class="v" id="hrVal">-- bpm</div></div>
+        <div class="vcard"><div class="k">SpO₂</div><div class="v" id="spVal">-- %</div></div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="openTracker">🐾 Paw Prints</button>
+        <button class="btn ghost" id="editProfile">Edit profile</button>
+        <input id="uploadPhoto" type="file" accept="image/*" style="display:none">
+      </div>
+    </div>
+  </section>
+
+  <!-- EVERYDAY ESSENTIALS -->
+  <section class="section reveal" data-ani>
+    <h2>Everyday essentials</h2>
+    <div class="grid-cats" aria-hidden="false">
+      <a href="dog-food.html" class="cat">
+        <img src="dogg_food.jpg" alt="Dog Food">
+        <div class="label">Dog food</div>
+      </a>
+      <a href="cat-food.html" class="cat">
+        <img src="catfood.jpg" alt="Cat Food">
+        <div class="label">Cat food</div>
+      </a>
+      <a href="treats.html" class="cat">
+        <img src="treats.jpg" alt="Treats">
+        <div class="label">Treats</div>
+      </a>
+      <a href="litter.html" class="cat">
+        <img src="litter.jpeg" alt="Litter">
+        <div class="label">Litter supplies</div>
+      </a>
+      <a href="premium.html" class="cat">
+        <img src="premium.jpeg" alt="Premium">
+        <div class="label">Premium food</div>
+      </a>
+      <a href="fresh-food.html" class="cat">
+        <img src="fresh food.jpeg" alt="Fresh food">
+        <div class="label">Fresh food</div>
+      </a>
+      <a href="food-supplements.html" class="cat">
+        <img src="food suplement.png" alt="Supplements">
+        <div class="label">Food supplements</div>
+      </a>
+      <a href="gps-tracker.html" class="cat">
+        <img src="gps track.jpeg" alt="GPS tracker">
+        <div class="label">GPS tracker</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- WELLNESS -->
+  <section class="section reveal" data-ani>
+    <h2>All-round Wellness</h2>
+    <div class="grid-3">
+      <a href="skin-care.html" class="card">
+        <img class="thumb" src="skin care.png" alt="Skin care">
+        <div style="padding:10px">
+          <h3 style="margin:0 0 6px;color:white">Skin care</h3>
+          <p style="color:#cfe0ff;margin:0">Extra 12% OFF • Code: PAWNEW</p>
+        </div>
+      </a>
+
+      <a href="tick-fleas.html" class="card">
+        <img class="thumb" src="tick and fleas.png" alt="Tick & Fleas">
+        <div style="padding:10px">
+          <h3 style="margin:0 0 6px;color:white">Tick & Fleas</h3>
+          <p style="color:#cfe0ff;margin:0">Save ₹250 • Code: SAVE250</p>
+        </div>
+      </a>
+
+      <a href="joint-care.html" class="card">
+        <img class="thumb" src="joint.jpeg" alt="Joint care">
+        <div style="padding:10px">
+          <h3 style="margin:0 0 6px;color:white">Joint care</h3>
+          <p style="color:#cfe0ff;margin:0">Extra 5% OFF • Code: HENLO</p>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Dummy banner section (service.png) -->
+  <section class="section reveal" data-ani>
+    <img src="service.png" style="width:100%;height:280px;object-fit:cover;border-radius:16px;border:1px solid var(--ring);box-shadow:var(--shadow)" alt="Pet Services Banner (Coming Soon)">
+  </section>
+
+  <!-- BLOGS -->
+  <section class="section reveal" data-ani>
+    <h2 style="text-align:center">Blogs</h2>
+    <div class="blogs">
+      <div class="card"><img class="thumb" src="blog.png" style="height:360px" alt=""></div>
+      <div>
+        <a href="blog-bathe-dog.html" class="post"><img src="bath.png" alt=""><div>How to bathe a dog at home</div></a>
+        <a href="blog-smelly-cat.html" class="post"><img src="smelly.png" alt=""><div>Smelly cat? Try this</div></a>
+        <a href="blog-fur.html" class="post"><img src="fur.png" alt=""><div>Defeating matted fur</div></a>
+        <a href="blog-dandruff.html" class="post"><img src="dandruff.png" alt=""><div>Dandruff in dogs: causes</div></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- footer -->
+  <footer data-ani>
+    <div style="font-weight:800; color:var(--ink)">“Paws, Play, Protect — unleash your pet’s Pawtential.”</div>
+
+    <div class="socials" aria-label="Social links">
+      <!-- Instagram -->
+      <a href="https://instagram.com/yourpage" target="_blank" rel="noopener" aria-label="Instagram" class="icon-circle">
+        <i class="fab fa-instagram" style="color:#fff"></i>
+      </a>
+
+      <!-- Facebook -->
+      <a href="https://facebook.com/yourpage" target="_blank" rel="noopener" aria-label="Facebook" class="icon-circle">
+        <i class="fab fa-facebook-f" style="color:#fff"></i>
+      </a>
+
+      <!-- Gmail (mailto) - opens compose (change the address below if needed) -->
+      <a href="mailto:contact@pawtential.com" aria-label="Email us" class="icon-circle" title="Email us">
+        <i class="fas fa-envelope" style="color:#fff"></i>
+      </a>
+
+      <div style="color:var(--muted);margin-left:8px">Customer Care: <a href="tel:+917975583688" style="color:var(--ink);text-decoration:none">+91 7975583688</a></div>
+    </div>
+  </footer>
+</main>
+
+<script>
+/* Loader fade after 3s */
+window.addEventListener('load', () => {
+  setTimeout(()=> {
+    const l = document.getElementById('loader');
+    if(l){ l.style.transition = 'opacity .45s ease'; l.style.opacity = '0'; setTimeout(()=> l.remove(), 480); }
+  }, 3000);
+});
+
+/* Drawer open/close */
+const drawer = document.getElementById('drawer');
+const openBtn = document.getElementById('openDrawer');
+const shade = document.getElementById('shade');
+if(openBtn){
+  openBtn.addEventListener('click', () => {
+    drawer.classList.add('open');
+    drawer.setAttribute('aria-hidden', 'false');
+  });
+}
+if(shade){
+  shade.addEventListener('click', () => {
+    drawer.classList.remove('open');
+    drawer.setAttribute('aria-hidden', 'true');
+  });
+}
+
+/* Intersection reveal */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+  });
+},{ threshold: 0.12 });
+document.querySelectorAll('[data-ani]').forEach(el => io.observe(el));
+
+/* ThingSpeak placeholders */
+const THINGSPEAK_CHANNEL = 'REPLACE_CHANNEL_ID';
+async function getLatest(){
+  if(THINGSPEAK_CHANNEL==='REPLACE_CHANNEL_ID') return null;
+  try{
+    const u = `https://api.thingspeak.com/channels/${THINGSPEAK_CHANNEL}/feeds.json?results=1`;
+    const r = await fetch(u); const j = await r.json();
+    return (j.feeds && j.feeds[0]) ? j.feeds[0] : null;
+  }catch(e){ console.error(e); return null; }
+}
+function setStatus(tsISO){
+  const ts = tsISO ? new Date(tsISO).getTime() : 0;
+  const age = Date.now() - ts;
+  const statusEl = document.getElementById('statusEl');
+  const text = document.getElementById('statusText');
+  if(age < 20000){ statusEl.classList.add('online'); text.textContent='Connected'; }
+  else { statusEl.classList.remove('online'); text.textContent='Offline'; }
+}
+async function poll(){
+  const f = await getLatest();
+  if(!f) return;
+  setStatus(f.created_at);
+  if(f.field1 != null) document.getElementById('tempVal').textContent = Number(f.field1).toFixed(1) + ' °C';
+  if(f.field2 != null) document.getElementById('hrVal').textContent = Math.round(f.field2) + ' bpm';
+  if(f.field3 != null) document.getElementById('spVal').textContent = Math.round(f.field3) + ' %';
+}
+if(THINGSPEAK_CHANNEL !== 'REPLACE_CHANNEL_ID'){ poll(); setInterval(poll, 5000); }
+
+/* Pet profile editing & image upload (localStorage) */
+const defaults = { name:'Bella', owner:'Prajwal Naik', age:'8 years', breed:'Golden Labrador', color:'Fawn', device:'collar-001' };
+function loadProfile(){
+  const p = JSON.parse(localStorage.getItem('paw_profile') || 'null') || defaults;
+  document.getElementById('petNameDisp').textContent = p.name;
+  document.getElementById('ownerLineDisp').textContent = `Owner: ${p.owner} • Age: ${p.age} • Breed: ${p.breed} • Color: ${p.color} • Device: ${p.device}`;
+  document.getElementById('pNameMenu').textContent = p.name;
+  document.getElementById('pOwnerMenu').textContent = 'Owner: ' + p.owner;
+  document.getElementById('menuPetThumb').src = localStorage.getItem('paw_photo') || '/mnt/data/bella.jpeg';
+  const sp = localStorage.getItem('paw_photo');
+  if(sp) document.getElementById('petPhoto').src = sp;
+}
+function editProfile(){
+  const cur = JSON.parse(localStorage.getItem('paw_profile') || 'null') || defaults;
+  const name = prompt('Pet name', cur.name) ?? cur.name;
+  const owner = prompt('Owner name', cur.owner) ?? cur.owner;
+  const age = prompt('Age', cur.age) ?? cur.age;
+  const breed = prompt('Breed', cur.breed) ?? cur.breed;
+  const color = prompt('Color', cur.color) ?? cur.color;
+  const device = prompt('Device id/name', cur.device) ?? cur.device;
+  const next = { name, owner, age, breed, color, device };
+  localStorage.setItem('paw_profile', JSON.stringify(next));
+  loadProfile();
+}
+document.getElementById('editProfile').addEventListener('click', ()=>{
+  const choice = confirm('Edit text fields? OK = edit details, Cancel = change photo');
+  if(choice) editProfile();
+  else document.getElementById('uploadPhoto').click();
+});
+document.getElementById('uploadPhoto').addEventListener('change', (e)=>{
+  const f = e.target.files[0]; if(!f) return;
+  const rd = new FileReader();
+  rd.onload = ()=>{ localStorage.setItem('paw_photo', rd.result); document.getElementById('petPhoto').src = rd.result; document.getElementById('menuPetThumb').src = rd.result; };
+  rd.readAsDataURL(f);
+});
+loadProfile();
+
+/* Demo status + vitals */
+(function demo(){
+  function setStatusLocal(on){ const el=document.getElementById('statusEl'), tx=document.getElementById('statusText'); if(on){ el.classList.add('online'); tx.textContent='Connected'; }else{ el.classList.remove('online'); tx.textContent='Offline'; } }
+  let s=false; setInterval(()=>{ s=!s; setStatusLocal(s); }, 10000);
+  function demoVitals(){ document.getElementById('tempVal').textContent = (36+Math.random()*2).toFixed(1)+' °C'; document.getElementById('hrVal').textContent = (70+Math.floor(Math.random()*30))+' bpm'; document.getElementById('spVal').textContent = (96+Math.floor(Math.random()*3))+' %'; }
+  demoVitals(); setInterval(demoVitals, 4500);
+})();
+
+/* Paw Prints link → tracker.html (pass channel & key if set) */
+document.getElementById('openTracker').addEventListener('click', ()=>{
+  const THINGSPEAK_CHANNEL = 'REPLACE_CHANNEL_ID';
+  const THINGSPEAK_READ_KEY = 'REPLACE_READ_KEY';
+  const url = `tracker.html?channel=${encodeURIComponent(THINGSPEAK_CHANNEL)}&key=${encodeURIComponent(THINGSPEAK_READ_KEY)}`;
+  location.href = url;
+});
+</script>
+</body>
+</html>

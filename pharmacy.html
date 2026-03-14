@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pawtential Pharmacy</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root{
+  --ink:#ffffff;
+  --muted:#cfc6ff;
+  --neon:#b05bff;
+  --neon-2:#8a3bff;
+  --shadow:0 20px 60px rgba(16,6,28,0.7);
+}
+
+body{
+  margin:0;
+  font-family:Urbanist;
+  background:#050009 url("stock-vector-dark-abstract-welcome-page-with-purple-blue-waves-2633393175.jpg") center/cover fixed;
+  color:var(--ink);
+}
+
+header{
+  padding:20px;
+  text-align:center;
+  font-size:32px;
+  font-weight:800;
+  background:linear-gradient(180deg,rgba(10,0,16,0.65),rgba(10,0,16,0.4));
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+
+/* SECTION */
+.section{
+  max-width:1200px;
+  margin:28px auto;
+  padding:0 16px;
+}
+.section h2{
+  font-size:28px;
+  margin-bottom:14px;
+  font-weight:800;
+}
+
+/* SEARCH */
+.searchbar{
+  position:relative;
+  display:flex;
+  gap:8px;
+  padding:12px;
+  background:rgba(255,255,255,0.05);
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.08);
+}
+.searchbar input{
+  flex:1;
+  background:transparent;
+  border:0;
+  outline:none;
+  color:white;
+  font-size:16px;
+}
+.searchbar button{
+  background:transparent;
+  border:0;
+  color:white;
+  cursor:pointer;
+  font-size:18px;
+}
+
+/* AUTOCOMPLETE DROPDOWN */
+.suggestions{
+  position:absolute;
+  top:50px;
+  left:0;
+  right:0;
+  background:#14001f;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.08);
+  display:none;
+  z-index:40;
+}
+.suggestions div{
+  padding:10px;
+  cursor:pointer;
+  color:white;
+}
+.suggestions div:hover{
+  background:rgba(176,91,255,0.15);
+}
+
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:16px;
+}
+.card{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;
+  padding:12px;
+  text-align:center;
+  cursor:pointer;
+  transition:.25s;
+}
+.card:hover{
+  transform:translateY(-6px);
+  background:linear-gradient(90deg,rgba(176,91,255,0.06),rgba(92,225,255,0.03));
+}
+.card img{
+  width:100%;
+  height:150px;
+  border-radius:12px;
+  object-fit:cover;
+}
+.label{
+  margin-top:10px;
+  font-size:18px;
+  font-weight:800;
+}
+.sub{
+  font-size:13px;
+  margin-top:4px;
+  color:var(--muted);
+}
+
+.linkbtn{
+  display:block;
+  margin-top:8px;
+  padding:8px;
+  border-radius:10px;
+  background:linear-gradient(90deg,var(--neon),var(--neon-2));
+  color:black;
+  font-weight:700;
+  text-decoration:none;
+}
+</style>
+</head>
+<body>
+
+<header>Pawtential — Pet Pharmacy 🐾</header>
+
+<!-- SEARCH BAR -->
+<div class="section">
+  <div class="searchbar">
+    <input id="searchInput" placeholder="Search medicines, vaccines, dewormers…">
+    <button onclick="runSearch()">🔍</button>
+    <div id="suggestions" class="suggestions"></div>
+  </div>
+</div>
+
+<!-- DOG PHARMACY -->
+<div class="section">
+  <h2>Dog Pharmacy</h2>
+  <div class="grid">
+
+    <div class="card">
+      <img src="dww.jpeg">
+      <div class="label">Dog Deworming Tablets</div>
+      <div class="sub">Removes internal worms</div>
+      <a class="linkbtn" href="https://www.amazon.in/s?k=dog+dewormer">Buy Now</a>
+    </div>
+
+    <div class="card">
+      <img src="tf.jpeg">
+      <div class="label">Tick & Flea Spray</div>
+      <div class="sub">Fast protection from ticks</div>
+      <a class="linkbtn" href="https://www.amazon.in/s?k=dog+tick+spray">Buy Now</a>
+    </div>
+
+    <div class="card">
+      <img src="vcc.jpeg">
+      <div class="label">Core Dog Vaccines</div>
+      <div class="sub">Parvo • DHPPi • Rabies</div>
+      <a class="linkbtn" href="https://www.petmd.com">Info</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- CAT PHARMACY -->
+<div class="section">
+  <h2>Cat Pharmacy</h2>
+  <div class="grid">
+
+    <div class="card">
+      <img src="56.jpeg">
+      <div class="label">Cat Deworming Drops</div>
+      <div class="sub">Safe for kittens</div>
+      <a class="linkbtn" href="https://www.amazon.in/s?k=cat+dewormer">Buy Now</a>
+    </div>
+
+    <div class="card">
+      <img src="57.jpeg">
+      <div class="label">Feline Vaccines</div>
+      <div class="sub">FVRCP • Rabies</div>
+      <a class="linkbtn" href="https://www.petmd.com">Info</a>
+    </div>
+
+    <div class="card">
+      <img src="eye.jpeg">
+      <div class="label">Cat Eye/Ear Drops</div>
+      <div class="sub">Irritation relief</div>
+      <a class="linkbtn" href="https://www.amazon.in/s?k=cat+eye+drops">Buy Now</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- SMALL PET PHARMACY -->
+<div class="section">
+  <h2>Small Pets</h2>
+  <div class="grid">
+
+    <div class="card">
+      <img src="rs.jpeg">
+      <div class="label">Rabbit Supplements</div>
+      <div class="sub">Boost immunity</div>
+      <a class="linkbtn" href="https://www.amazon.in/s?k=rabbit+supplements">Buy Now</a>
+    </div>
+
+    <div class="card">
+      <img src="9.jpg">
+      <div class="label">Hamster Health Kit</div>
+      <div class="sub">Basic first aid</div>
+      <a class="linkbtn" href="https://www.amazon.in/s?k=hamster+medicine">Buy Now</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- GENERAL MEDICAL ITEMS -->
+<div class="section">
+  <h2>General Medical Essentials</h2>
+  <div class="grid">
+
+    <div class="card">
+      <img src="aid.jpeg">
+      <div class="label">Pet First-Aid Kit</div>
+      <div class="sub">Bandages • antiseptic • meds</div>
+      <a class="linkbtn" href="https://www.amazon.in/s?k=pet+first+aid+kit">Buy Now</a>
+    </div>
+
+    <div class="card">
+      <img src="oit.jpeg">
+      <div class="label">Skin Ointments</div>
+      <div class="sub">Hot spots • rashes</div>
+      <a class="linkbtn" href="https://www.amazon.in/s?k=pet+skin+ointment">Buy Now</a>
+    </div>
+
+    <div class="card">
+      <img src="sup.jpeg">
+      <div class="label">Health Supplements</div>
+      <div class="sub">Calcium • Multivitamins</div>
+      <a class="linkbtn" href="https://www.amazon.in/s?k=pet+supplement">Buy Now</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// SEARCH MAP
+const items = {
+  "dog dewormer": "https://www.amazon.in/s?k=dog+dewormer",
+  "tick spray": "https://www.amazon.in/s?k=dog+tick+spray",
+  "dog vaccine": "https://www.petmd.com",
+
+  "cat dewormer": "https://www.amazon.in/s?k=cat+dewormer",
+  "cat vaccine": "https://www.petmd.com",
+  "cat eye drops": "https://www.amazon.in/s?k=cat+eye+drops",
+
+  "rabbit supplement": "https://www.amazon.in/s?k=rabbit+supplements",
+  "hamster medicine": "https://www.amazon.in/s?k=hamster+medicine",
+
+  "first aid": "https://www.amazon.in/s?k=pet+first+aid+kit",
+  "skin ointment": "https://www.amazon.in/s?k=pet+skin+ointment",
+  "supplement": "https://www.amazon.in/s?k=pet+supplement"
+};
+
+const input = document.getElementById("searchInput");
+const suggBox = document.getElementById("suggestions");
+
+// AUTOCOMPLETE
+input.addEventListener("input", () => {
+  let q = input.value.toLowerCase();
+  suggBox.innerHTML = "";
+  suggBox.style.display = "none";
+
+  if(q.length === 0) return;
+
+  let match = Object.keys(items).filter(i => i.includes(q));
+
+  if(match.length){
+    suggBox.style.display = "block";
+    match.forEach(m => {
+      let div = document.createElement("div");
+      div.textContent = m;
+      div.onclick = () => runSearch(m);
+      suggBox.appendChild(div);
+    });
+  }
+});
+
+function runSearch(text){
+  let q = (text || input.value).toLowerCase();
+
+  if(items[q]){
+    location.href = items[q];
+  } else {
+    alert("No matching item found 😿");
+  }
+}
+</script>
+
+</body>
+</html>
